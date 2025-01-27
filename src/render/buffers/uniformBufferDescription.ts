@@ -11,7 +11,7 @@ export class UniformBufferDescription {
         this.canvas = canvas;
         
         this.gpuBuffer = device.createBuffer({
-            size: 8,
+            size: 20, // 5 floats x 4 bytes
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           });
     }
