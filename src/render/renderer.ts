@@ -2,6 +2,7 @@
 import { Pipelines } from "./pipelines";
 import { BufferManager } from "./buffers/bufferManager";
 import { PipelineBindGroupLayouts } from "./bindGroupLayouts";
+import { UniformSettings } from "./layouts/uniformBufferSettings";
 
 export class Renderer {
 
@@ -32,18 +33,12 @@ export class Renderer {
 
     async setupDevice() {
         try {
-            //adapter: wrapper around (physical) GPU.
-            //Describes features and limits
             const adapter = await navigator.gpu?.requestAdapter();
             if (!adapter) {
                 throw new Error("Failed to get GPU adapter.");
             }
             this.adapter = adapter;
-            console.log("GPU adapter obtained:", this.adapter);
 
-            console.log("Requesting GPU device...");
-            //device: wrapper around GPU functionality
-            //Function calls are made through the device
             const device = await this.adapter.requestDevice();
             if (!device) {
                 throw new Error("Failed to get GPU device.");
@@ -56,9 +51,6 @@ export class Renderer {
                 this.setupDevice();
             });
             
-            console.log("GPU device obtained:", this.device);
-            
-            console.log("Getting WebGPU context...");
             //context: similar to vulkan instance (or OpenGL context)
             const context = this.canvas.getContext("webgpu");
             if (!context) {
@@ -74,7 +66,6 @@ export class Renderer {
                 format: this.format,
                 alphaMode: "opaque"
             });
-            console.log("Context configured successfully.");
 
             // Add cleanup on unload
             const cleanup = () => {
@@ -91,13 +82,10 @@ export class Renderer {
         }
     }
 
-    render(pDeltaTime: number) {
-        console.log("Rendering frame with delta time:", pDeltaTime);
+    render(pUniformBufferSettings: UniformSettings) {
 
-        this.bufferManager.updateUniformBuffer({
-            deltaTime: pDeltaTime,
-            frequency: 20.0
-        });
+        this.bufferManager.updateUniformBuffer(
+                pUniformBufferSettings);
 
         const commandEncoder : GPUCommandEncoder = this.device.createCommandEncoder();
 

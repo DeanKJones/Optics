@@ -1,6 +1,6 @@
 import { ScreenBufferDescription } from "./screenBufferDescription";
 import { UniformBufferDescription } from "./uniformBufferDescription";
-import { UniformBufferStruct } from "../layouts/uniformBufferStruct";
+import { UniformSettings } from "../layouts/uniformBufferSettings";
 
 export class BufferManager {
 
@@ -17,20 +17,22 @@ export class BufferManager {
         this.screenBuffers = new ScreenBufferDescription(this.device, this.canvas);
         this.uniformBuffer = new UniformBufferDescription(this.device, this.canvas);
 
-        this.writeDefaultBuffers();
+        // Default Settings
+        let uniformSettings = new UniformSettings();
+        this.writeDefaultBuffers(uniformSettings);
     }
 
 
-    writeDefaultBuffers = () => {
-        this.updateUniformBuffer({    // Default values
-            deltaTime: 0.0,
-            frequency: 20.0,
-        });
+    writeDefaultBuffers = (uniformBufferParams: UniformSettings) => {
+        this.updateUniformBuffer(uniformBufferParams);
     }
 
-    updateUniformBuffer = (uniformBufferParams: UniformBufferStruct) => {
+    updateUniformBuffer = (uniformBufferParams: UniformSettings) => {
             this.device.queue.writeBuffer(this.uniformBuffer.gpuBuffer, 0, 
                     new Float32Array([uniformBufferParams.deltaTime,
-                                     uniformBufferParams.frequency,]));
+                                      uniformBufferParams.frequency,
+                                      uniformBufferParams.slitWidth,
+                                      uniformBufferParams.grateWidth,
+                                      uniformBufferParams.numberOfSlits]));
         }
 }

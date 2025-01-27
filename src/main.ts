@@ -2,7 +2,7 @@ import { App } from "./app"
 
 const canvases = {
     viewportMain: <HTMLCanvasElement>document.getElementById("gfx-main"),
-    sceneParameters: <HTMLCanvasElement>document.getElementById("scene-params")
+    settingsMain: <HTMLCanvasElement>document.getElementById("settings")
 };
 
 const app = new App(canvases);
