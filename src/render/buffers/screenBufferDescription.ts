@@ -13,9 +13,9 @@ export class ScreenBufferDescription {
 
         this.colorBuffer = this.device.createTexture(
             {
-                size: {
-                    width: this.canvas.width,
-                    height: this.canvas.height,
+                size: {     // uuuh supersample?
+                    width: this.canvas.width * 4, 
+                    height: this.canvas.height * 4,
                 },
                 format: "rgba8unorm",
                 usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING

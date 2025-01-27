@@ -93,8 +93,8 @@ export class Renderer {
         ray_trace_pass.setPipeline(this.renderPipelines.computePipeline);
         ray_trace_pass.setBindGroup(0, this.pipelineBindGroups.computeBindGroup);
         ray_trace_pass.dispatchWorkgroups(
-            this.canvas.width, 
-            this.canvas.height, 1
+            this.canvas.width * 4,      // 2x the resolution for supersampling
+            this.canvas.height * 4, 1
         );
         ray_trace_pass.end();
 
@@ -110,7 +110,7 @@ export class Renderer {
 
         renderpass.setPipeline(this.renderPipelines.screenPipeline);
         renderpass.setBindGroup(0, this.pipelineBindGroups.screenBindGroup);
-        renderpass.draw(12, 1, 0, 0);
+        renderpass.draw(6, 1, 0, 0);
         
         renderpass.end();
     
