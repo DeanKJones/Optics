@@ -17,9 +17,10 @@ This project provides a WebGPU-based simulation environment for visualizing wave
 
 ## Features
 
-- **Diffraction Grating Simulation**: Visualize the interference pattern behind diffraction grids.
-- **Wave Optics Simulation**: Implement FDTD simulations to solve Maxwell's equations.
-- **Spectral Passes**: Simulate spectral passes to analyze wave behavior.
+- **Diffraction Grating Simulation**: Visualize the interference pattern behind a set diffraction grid.
+![](assets/embedded/Interference.gif)
+- **Wave Optics Simulation**: `TODO` FDTD simulations to solve Maxwell's equations.
+- **Spectral Passes**: `TODO` Spectral passes to analyze wave behavior.
 
 ## Installation
 
