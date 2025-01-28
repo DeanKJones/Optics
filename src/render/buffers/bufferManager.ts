@@ -33,6 +33,7 @@ export class BufferManager {
                                       uniformBufferParams.frequency,
                                       uniformBufferParams.slitWidth,
                                       uniformBufferParams.grateWidth,
-                                      uniformBufferParams.numberOfSlits]));
+                                      uniformBufferParams.numberOfSlits,
+                                      uniformBufferParams.screenSize,]));
         }
 }

@@ -31,6 +31,10 @@ export class App
         numberOfSlitsSlider.addEventListener("input", () => {
             this.settings.numberOfSlits = parseFloat(numberOfSlitsSlider.value);
         });
+        const screenSizeSlider = document.getElementById("screen-size-mult-slider") as HTMLInputElement;
+        screenSizeSlider.addEventListener("input", () => {
+            this.settings.screenSize = parseFloat(screenSizeSlider.value);
+        });
     }
 
     run = () => {

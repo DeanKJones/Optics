@@ -14,6 +14,7 @@ struct uniformBufferStruct {
     slitWidth: f32,
     grateWidth: f32,
     numberOfSlits: f32,
+    screenSizeMultiplier: f32,
 }
 
 // ---------------------------------------------------------------------------
@@ -38,11 +39,15 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     let fragCoord = vec2<f32>(f32(screen_pos.x), f32(screen_pos.y));
     let resolution = vec2<f32>(f32(screen_size.x), f32(screen_size.y));
 
-    let uv = (2.0 * fragCoord - resolution) / resolution.y;
+    var uv = (2.0 * fragCoord - resolution) / resolution.y;
+    uv.x = uniform_buffer.screenSizeMultiplier * f32(uv.x);
+    uv.y = uniform_buffer.screenSizeMultiplier * f32(uv.y);
 
     // Prepare accumulation
     var amplitude: f32 = 0.0;
     var minDistanceToSlit: f32 = 1e6;
+
+    let grateHeight = GRATE_HEIGHT * uniform_buffer.screenSizeMultiplier;
 
     let numberOfSlits = i32(uniform_buffer.numberOfSlits);
 
@@ -55,8 +60,9 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
         minDistanceToSlit = min(minDistanceToSlit, distToSlit);
 
         // wave accumulation
-        if (uv.y > GRATE_HEIGHT) {
-            amplitude = amplitude + wave(uv, x, uniform_buffer.frequency, uniform_buffer.dt);
+        if (uv.y > grateHeight) {
+            // Here uniform.dt acts as the phase
+            amplitude = amplitude + wave(uv, horizontalSlitCoordinate, uniform_buffer.frequency, uniform_buffer.dt);
         } else {
             amplitude = amplitude + parallelWave(uv.y, uniform_buffer.frequency, uniform_buffer.dt, uniform_buffer.numberOfSlits);
         }
@@ -64,8 +70,9 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
     // Average over the slits
     amplitude = amplitude / uniform_buffer.numberOfSlits;
+    amplitude *= uniform_buffer.screenSizeMultiplier * 2.0;
 
-    minDistanceToSlit = max(-minDistanceToSlit, abs(uv.y - GRATE_HEIGHT) - diffractionWidth * 0.5);
+    minDistanceToSlit = max(-minDistanceToSlit, abs(uv.y - grateHeight) - diffractionWidth * 0.5);
     let color = simpleAmplitudeToColor(amplitude) + ss(minDistanceToSlit, resolution.y) * vec3<f32>(1.0, 1.0, 1.0);
 
     // Store to the screen buffer

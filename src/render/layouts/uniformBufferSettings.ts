@@ -6,6 +6,7 @@ export class UniformSettings {
     slitWidth: number = 0.005;
     grateWidth: number = 0.3;
     numberOfSlits: number = 10.0;
+    screenSize: number = 1.0;
 
     constructor(){
         this.deltaTime = 0.0;
@@ -13,6 +14,7 @@ export class UniformSettings {
         this.slitWidth = 0.005;
         this.grateWidth = 0.3;
         this.numberOfSlits = 10.0;
+        this.screenSize = 1.0;
     }
 
     update(pSettings: UniformSettings) {
@@ -21,6 +23,7 @@ export class UniformSettings {
         this.slitWidth = pSettings.slitWidth;
         this.grateWidth = pSettings.grateWidth;
         this.numberOfSlits = pSettings.numberOfSlits;
+        this.screenSize = pSettings.screenSize;
     }
 
     renderSettingsUI(ctx: CanvasRenderingContext2D) {
@@ -46,6 +49,7 @@ export class UniformSettings {
         ctx.fillText(`Diffraction Slit Width: ${this.slitWidth}`, 10, 80);
         ctx.fillText(`Diffraction Grate Width: ${this.grateWidth}`, 10, 100);
         ctx.fillText(`Number of Slits: ${this.numberOfSlits}`, 10, 120);
+        ctx.fillText(`Screen Size Multiplier: ${this.screenSize}`, 10, 140);
     }
 }
 
