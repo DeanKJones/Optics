@@ -13,7 +13,7 @@ This project is inspired by 3Blue1Brown's video on holograms and aims to simulat
 ## Introduction
 
 This project provides a WebGPU-based simulation environment for visualizing wave optics phenomena, including diffraction patterns and interference effects. 
-The goal is to have simulations that are based on solving Maxwell's equations using FDTD methods. With the hope of moving onto rendering several orbitals along with the EM field.
+The goal is to have simulations that are based on solving Maxwell's equations using FDTD methods. With the hope of moving onto rendering simple hydrogen orbitals along with the EM field :)
 
 
 ## Features
