@@ -1,6 +1,6 @@
 # Wave Optics
 
-This project is inspired by 3Blue1Brown's video on holograms and aims to simulate the interference pattern behind diffraction grid. The goal is to expand on this and implement Finite-Difference Time-Domain (FDTD) simulations and spectral rendering to learn wave optics and Maxwell's equations.
+This project is inspired by 3Blue1Brown's video on holograms and aims to simulate the interference pattern behind diffraction grid.
 
 ## Table of Contents
 
@@ -12,15 +12,15 @@ This project is inspired by 3Blue1Brown's video on holograms and aims to simulat
 
 ## Introduction
 
-This project provides a WebGPU-based simulation environment for visualizing wave optics phenomena, including diffraction patterns and interference effects. The simulations are based on solving Maxwell's equations using FDTD methods.
+This project provides a WebGPU-based simulation environment for visualizing wave optics phenomena, including diffraction patterns and interference effects. 
+The goal is to have simulations that are based on solving Maxwell's equations using FDTD methods. With the hope of moving onto rendering several orbitals along with the EM field.
 
 
 ## Features
 
 - **Diffraction Grating Simulation**: Visualize the interference pattern behind a set diffraction grid.
 ![](assets/embedded/Interference.gif)
-- **Wave Optics Simulation**: `TODO` FDTD simulations to solve Maxwell's equations.
-- **Spectral Passes**: `TODO` Spectral passes to analyze wave behavior.
+- **Spectral Passes**: `TODO` Spectral passes.
 
 ## Installation
 
