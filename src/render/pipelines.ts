@@ -56,23 +56,21 @@ export class Pipelines {
             
             vertex: {
                 module: this.device.createShaderModule({
-                code: screenShader,
-            }),
-            entryPoint: 'vert_main',
+                                    code: screenShader, 
+                                }),
+                entryPoint: 'vert_main',
             },
 
             fragment: {
                 module: this.device.createShaderModule({
-                code: screenShader,
-            }),
-            entryPoint: 'frag_main',
-            targets: [
+                                    code: screenShader,
+                                }),
+                entryPoint: 'frag_main',
+                targets: [
                 {
                     format: "bgra8unorm"
-                }
-            ]
+                }]
             },
-
             primitive: {
                 topology: "triangle-list"
             }
