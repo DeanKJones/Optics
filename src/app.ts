@@ -15,25 +15,23 @@ export class App
             this.run();
         });
 
-        const frequencySlider = document.getElementById("frequency-slider") as HTMLInputElement;
-        frequencySlider.addEventListener("input", () => {
-            this.settings.frequency = parseFloat(frequencySlider.value);
-        });
-        const slitWidthSlider = document.getElementById("slit-width-slider") as HTMLInputElement;
-        slitWidthSlider.addEventListener("input", () => {
-            this.settings.slitWidth = parseFloat(slitWidthSlider.value);
-        });
-        const grateWidthSlider = document.getElementById("grate-width-slider") as HTMLInputElement;
-        grateWidthSlider.addEventListener("input", () => {
-            this.settings.grateWidth = parseFloat(grateWidthSlider.value);
-        });
-        const numberOfSlitsSlider = document.getElementById("number-of-slits-slider") as HTMLInputElement;
-        numberOfSlitsSlider.addEventListener("input", () => {
-            this.settings.numberOfSlits = parseFloat(numberOfSlitsSlider.value);
-        });
-        const screenSizeSlider = document.getElementById("screen-size-mult-slider") as HTMLInputElement;
-        screenSizeSlider.addEventListener("input", () => {
-            this.settings.screenSize = parseFloat(screenSizeSlider.value);
+        const sliderConfigs = [
+            { elementId: "frequency-slider", settingKey: "frequency" },
+            { elementId: "slit-width-slider", settingKey: "slitWidth" },
+            { elementId: "grate-width-slider", settingKey: "grateWidth" },
+            { elementId: "number-of-slits-slider", settingKey: "numberOfSlits" },
+            { elementId: "screen-size-mult-slider", settingKey: "screenSize" },
+        ];
+        
+        // Add event listeners for each slider
+        sliderConfigs.forEach(({ elementId, settingKey }) => {
+            const slider = document.getElementById(elementId) as HTMLInputElement;
+            if (slider) {
+                slider.addEventListener("input", () => {
+                    const value = parseFloat(slider.value);
+                    this.settings.setProperty(settingKey as any, value);
+                });
+            }
         });
     }
 

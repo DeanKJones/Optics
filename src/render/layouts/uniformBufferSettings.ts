@@ -1,3 +1,4 @@
+type NumericKeys = Exclude<keyof UniformSettings, "update" | "setProperty" | "renderSettingsUI">;
 
 export class UniformSettings {
 
@@ -24,6 +25,11 @@ export class UniformSettings {
         this.grateWidth = pSettings.grateWidth;
         this.numberOfSlits = pSettings.numberOfSlits;
         this.screenSize = pSettings.screenSize;
+    }
+
+    // I honestly don't quite get this code
+    setProperty(key: NumericKeys, value: number) {
+        this[key] = value;
     }
 
     renderSettingsUI(ctx: CanvasRenderingContext2D) {
