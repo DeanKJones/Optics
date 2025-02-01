@@ -1,7 +1,6 @@
 
-import { Pipelines } from "./pipelines";
 import { BufferManager } from "./buffers/bufferManager";
-import { PipelineBindGroupLayouts } from "./bindGroupLayouts";
+import { pipelineManager } from "./pipelines/pipelineManager";
 import { UniformSettings } from "./layouts/uniformBufferSettings";
 
 export class Renderer {
@@ -12,10 +11,9 @@ export class Renderer {
     device!: GPUDevice;
     context!: GPUCanvasContext;
     format!: GPUTextureFormat;
-
-    renderPipelines!: Pipelines;
-    pipelineBindGroups!: PipelineBindGroupLayouts;
+    
     bufferManager!: BufferManager;
+    pipelineManager!: pipelineManager;
 
 
     constructor(canvas: HTMLCanvasElement){
@@ -26,9 +24,7 @@ export class Renderer {
 
         await this.setupDevice();
         this.bufferManager = new BufferManager(this.device, this.canvas);
-
-        this.renderPipelines = new Pipelines(this.device);
-        this.pipelineBindGroups = new PipelineBindGroupLayouts(this.device, this.bufferManager);
+        this.pipelineManager = new pipelineManager(this.device, this.bufferManager);
     }
 
     async setupDevice() {
@@ -89,17 +85,17 @@ export class Renderer {
 
         const commandEncoder : GPUCommandEncoder = this.device.createCommandEncoder();
 
-        const ray_trace_pass : GPUComputePassEncoder = commandEncoder.beginComputePass();
-        ray_trace_pass.setPipeline(this.renderPipelines.computePipeline);
-        ray_trace_pass.setBindGroup(0, this.pipelineBindGroups.computeBindGroup);
-        ray_trace_pass.dispatchWorkgroups(
+        const rayTracePass : GPUComputePassEncoder = commandEncoder.beginComputePass();
+        rayTracePass.setPipeline(this.pipelineManager.computePipeline.computePipeline);
+        rayTracePass.setBindGroup(0, this.pipelineManager.computePipeline.computeBindGroup);
+        rayTracePass.dispatchWorkgroups(
             this.canvas.width * 8,      // 8x the resolution for supersampling
             this.canvas.height * 8, 1
         );
-        ray_trace_pass.end();
+        rayTracePass.end();
 
         const textureView : GPUTextureView = this.context.getCurrentTexture().createView();
-        const renderpass : GPURenderPassEncoder = commandEncoder.beginRenderPass({
+        const renderPass : GPURenderPassEncoder = commandEncoder.beginRenderPass({
             colorAttachments: [{
                 view: textureView,
                 clearValue: {r: 0.5, g: 0.0, b: 0.25, a: 1.0},
@@ -108,11 +104,11 @@ export class Renderer {
             }]
         });
 
-        renderpass.setPipeline(this.renderPipelines.screenPipeline);
-        renderpass.setBindGroup(0, this.pipelineBindGroups.screenBindGroup);
-        renderpass.draw(6, 1, 0, 0);
+        renderPass.setPipeline(this.pipelineManager.screenPipeline.screenPipeline);
+        renderPass.setBindGroup(0, this.pipelineManager.screenPipeline.screenBindGroup);
+        renderPass.draw(6, 1, 0, 0);
         
-        renderpass.end();
+        renderPass.end();
     
         this.device.queue.submit([commandEncoder.finish()]);
         this.device.queue.onSubmittedWorkDone()
