@@ -11,7 +11,7 @@ export class UniformBufferDescription {
         this.canvas = canvas;
         
         this.gpuBuffer = device.createBuffer({
-            size: 24, // 6 floats x 4 bytes
+            size: 32, // 8 floats x 4 bytes (including red/blue frequency ratios)
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           });
     }

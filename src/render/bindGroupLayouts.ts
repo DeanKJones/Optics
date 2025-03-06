@@ -1,4 +1,3 @@
-
 import { BindGroupLayouts } from "./pipelineLayouts";
 import { BufferManager } from "./buffers/bufferManager";
 
@@ -11,6 +10,7 @@ export class PipelineBindGroupLayouts {
 
     computeBindGroup!: GPUBindGroup;
     screenBindGroup!: GPUBindGroup;
+    fdtdBindGroup!: GPUBindGroup;
 
     constructor(device: GPUDevice, bufferManager: BufferManager) {
         this.device = device;
@@ -23,6 +23,7 @@ export class PipelineBindGroupLayouts {
     async initialize() {
         await this.CreateComputeBindGroupPipeline();
         await this.CreateScreenBindGroupPipeline();
+        await this.CreateFdtdBindGroupPipeline();
     }
 
     CreateComputeBindGroupPipeline = async () => {
@@ -60,6 +61,39 @@ export class PipelineBindGroupLayouts {
                 {
                     binding: 1,
                     resource: this.bufferManager.screenBuffers.colorBufferView
+                }
+            ]
+        });
+    }
+
+    CreateFdtdBindGroupPipeline = async () => {
+        const bindGroupLayout = this.bindGroupLayouts.createFdtdBindGroupLayout();
+        
+        this.fdtdBindGroup = this.device.createBindGroup({
+            label: "FDTD Bind Group",
+            layout: bindGroupLayout,
+            entries: [
+                {
+                    binding: 0,
+                    resource: this.bufferManager.fdtdBuffers.ezBufferView
+                },
+                {
+                    binding: 1,
+                    resource: this.bufferManager.fdtdBuffers.hxBufferView
+                },
+                {
+                    binding: 2,
+                    resource: this.bufferManager.fdtdBuffers.hyBufferView
+                },
+                {
+                    binding: 3,
+                    resource: this.bufferManager.fdtdBuffers.fieldVisualizationView
+                },
+                {
+                    binding: 4,
+                    resource: {
+                        buffer: this.bufferManager.uniformBuffer.gpuBuffer,
+                    }
                 }
             ]
         });

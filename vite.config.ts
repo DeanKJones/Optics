@@ -7,9 +7,12 @@ export default defineConfig({
         target: 'esnext',
         outDir: 'dist',
         rollupOptions: {
-            input: 'src/main.ts',
+            input: {
+                main: 'src/main.ts',
+                voxel: 'src/voxels/voxels.ts',
+            },
             output: {
-                entryFileNames: 'main.js',
+                entryFileNames: '[name].js',
             },
         },
     },

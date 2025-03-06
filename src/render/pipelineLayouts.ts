@@ -1,11 +1,10 @@
-
-
 export class BindGroupLayouts {
 
     device: GPUDevice;
 
     computeBindGroup_layout!: GPUBindGroupLayout;
     screenBindGroup_layout!: GPUBindGroupLayout;
+    fdtdBindGroup_layout!: GPUBindGroupLayout;
 
     constructor(device: GPUDevice) {
         this.device = device;
@@ -53,5 +52,57 @@ export class BindGroupLayouts {
             ]
         });
         return this.screenBindGroup_layout;
+    }
+
+    createFdtdBindGroupLayout = () => {
+        this.fdtdBindGroup_layout = this.device.createBindGroupLayout({
+            label: "FDTD Bind Group Layout",
+            entries: [
+                {
+                    binding: 0,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "read-write",
+                        format: "r32float",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 1,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "read-write",
+                        format: "r32float",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 2,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "read-write",
+                        format: "r32float",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 3,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "write-only",
+                        format: "rgba8unorm",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 4,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "uniform",
+                    }
+                }
+            ]
+        });
+        return this.fdtdBindGroup_layout;
     }
 }
