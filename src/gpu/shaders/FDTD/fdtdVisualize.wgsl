@@ -36,7 +36,7 @@ fn visualize(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
         let fieldMagnitude = abs(fieldValue);
         
         // Positive field = blue, negative field = red
-        if (fieldMagnitude > 0.001) { 
+        if (fieldMagnitude > 0.01) { 
             let scaledMagnitude = clamp(fieldValue, -0.7, 0.7);
 
             if (fieldValue > 0.0) {
