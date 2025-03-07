@@ -9,7 +9,6 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: 'src/main.ts',
-                voxel: 'src/voxels/voxels.ts',
             },
             output: {
                 entryFileNames: '[name].js',
