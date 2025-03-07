@@ -1,10 +1,7 @@
 // Clear shader for FDTD simulation textures
 // Resets all electromagnetic field components to zero
 
-@group(0) @binding(0) var electricField: texture_storage_2d<r32float, read_write>;
-@group(0) @binding(1) var magneticFieldX: texture_storage_2d<r32float, read_write>;
-@group(0) @binding(2) var magneticFieldY: texture_storage_2d<r32float, read_write>;
-@group(0) @binding(3) var visualOutput: texture_storage_2d<rgba8unorm, write>;
+#include "fdtdCommon.wgsl"
 
 @compute @workgroup_size(8, 8, 1)
 fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {

@@ -1,6 +1,9 @@
 import { BufferManager } from "../buffers/bufferManager";
-import fdtdKernel from "../../gpu/shaders/FDTD/fdtdComputeKernel.wgsl";
+
 import clearTexturesKernel from "../../gpu/shaders/FDTD/clearTexturesKernel.wgsl";
+import fdtdEField from "../../gpu/shaders/FDTD/fdtdEField.wgsl";
+import fdtdHField from "../../gpu/shaders/FDTD/fdtdHField.wgsl";
+import fdtdVisualize from "../../gpu/shaders/FDTD/fdtdVisualize.wgsl";
 
 export class fdtdComputePipelineDescriptor {
 
@@ -91,7 +94,7 @@ export class fdtdComputePipelineDescriptor {
             layout: fdtdPipeline_layout,
             compute: {
                 module: this.device.createShaderModule({
-                    code: fdtdKernel,
+                    code: fdtdHField,
                 }),
                 entryPoint: 'update_h_fields',
             }
@@ -103,7 +106,7 @@ export class fdtdComputePipelineDescriptor {
             layout: fdtdPipeline_layout,
             compute: {
                 module: this.device.createShaderModule({
-                    code: fdtdKernel,
+                    code: fdtdEField,
                 }),
                 entryPoint: 'update_e_fields',
             }
@@ -115,7 +118,7 @@ export class fdtdComputePipelineDescriptor {
             layout: fdtdPipeline_layout,
             compute: {
                 module: this.device.createShaderModule({
-                    code: fdtdKernel,
+                    code: fdtdVisualize,
                 }),
                 entryPoint: 'visualize',
             }
