@@ -1,6 +1,5 @@
-import { Pipelines } from "./pipelines";
+import { PipelineManager } from "./pipelines/pipelineManager";
 import { BufferManager } from "./buffers/bufferManager";
-import { PipelineBindGroupLayouts } from "./bindGroupLayouts";
 import { UniformSettings } from "./layouts/uniformBufferSettings";
 
 export class Renderer {
@@ -12,9 +11,8 @@ export class Renderer {
     context!: GPUCanvasContext;
     format!: GPUTextureFormat;
 
-    renderPipelines!: Pipelines;
-    pipelineBindGroups!: PipelineBindGroupLayouts;
     bufferManager!: BufferManager;
+    pipelineManager!: PipelineManager;
 
     // Add flag to switch between visualization modes
     useFdtdSimulation: boolean = false;
@@ -27,9 +25,7 @@ export class Renderer {
 
         await this.setupDevice();
         this.bufferManager = new BufferManager(this.device, this.canvas);
-
-        this.renderPipelines = new Pipelines(this.device);
-        this.pipelineBindGroups = new PipelineBindGroupLayouts(this.device, this.bufferManager);
+        this.pipelineManager = new PipelineManager(this.device, this.bufferManager);
     }
 
     async setupDevice() {
@@ -106,8 +102,8 @@ export class Renderer {
         const commandEncoder = this.device.createCommandEncoder();
         
         const ray_trace_pass = commandEncoder.beginComputePass();
-        ray_trace_pass.setPipeline(this.renderPipelines.computePipeline);
-        ray_trace_pass.setBindGroup(0, this.pipelineBindGroups.computeBindGroup);
+        ray_trace_pass.setPipeline(this.pipelineManager.computePipeline.computePipeline);
+        ray_trace_pass.setBindGroup(0, this.pipelineManager.computePipeline.computeBindGroup);
         ray_trace_pass.dispatchWorkgroups(
             this.canvas.width * 8,
             this.canvas.height * 8, 1
@@ -124,8 +120,8 @@ export class Renderer {
             }]
         });
         
-        renderpass.setPipeline(this.renderPipelines.screenPipeline);
-        renderpass.setBindGroup(0, this.pipelineBindGroups.screenBindGroup);
+        renderpass.setPipeline(this.pipelineManager.screenPipeline.screenPipeline);
+        renderpass.setBindGroup(0, this.pipelineManager.screenPipeline.screenBindGroup);
         renderpass.draw(6, 1, 0, 0);
         
         renderpass.end();
@@ -142,8 +138,8 @@ export class Renderer {
         const fdtd_compute_pass = commandEncoder.beginComputePass();
         
         // 1. Update H fields
-        fdtd_compute_pass.setPipeline(this.renderPipelines.fdtdPipelineH);
-        fdtd_compute_pass.setBindGroup(0, this.pipelineBindGroups.fdtdBindGroup);
+        fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineH);
+        fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
             Math.ceil(this.canvas.width * 4 / 8),
             Math.ceil(this.canvas.height * 4 / 8), 
@@ -151,8 +147,8 @@ export class Renderer {
         );
         
         // 2. Update E fields
-        fdtd_compute_pass.setPipeline(this.renderPipelines.fdtdPipelineE);
-        fdtd_compute_pass.setBindGroup(0, this.pipelineBindGroups.fdtdBindGroup);
+        fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineE);
+        fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
             Math.ceil(this.canvas.width * 4 / 8),
             Math.ceil(this.canvas.height * 4 / 8), 
@@ -160,8 +156,8 @@ export class Renderer {
         );
         
         // 3. Visualize the fields
-        fdtd_compute_pass.setPipeline(this.renderPipelines.fdtdVisualizationPipeline);
-        fdtd_compute_pass.setBindGroup(0, this.pipelineBindGroups.fdtdBindGroup);
+        fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdVisualizationPipeline);
+        fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
             Math.ceil(this.canvas.width * 4 / 8),
             Math.ceil(this.canvas.height * 4 / 8), 
@@ -184,7 +180,7 @@ export class Renderer {
         // Create a special bind group for FDTD visualization
         const fdtdScreenBindGroup = this.device.createBindGroup({
             label: "FDTD Screen Bind Group",
-            layout: this.renderPipelines.screenPipeline.getBindGroupLayout(0),
+            layout: this.pipelineManager.screenPipeline.screenPipeline.getBindGroupLayout(0),
             entries: [
                 {
                     binding: 0,
@@ -198,7 +194,7 @@ export class Renderer {
         });
         
         // Use the screen pipeline with the FDTD visualization
-        renderpass.setPipeline(this.renderPipelines.screenPipeline);
+        renderpass.setPipeline(this.pipelineManager.screenPipeline.screenPipeline);
         renderpass.setBindGroup(0, fdtdScreenBindGroup); // Use the FDTD-specific bind group
         renderpass.draw(6, 1, 0, 0);
         
@@ -215,8 +211,8 @@ export class Renderer {
         const computePass = commandEncoder.beginComputePass();
         
         // Set the clear pipeline
-        computePass.setPipeline(this.renderPipelines.fdtdClearPipeline);
-        computePass.setBindGroup(0, this.pipelineBindGroups.fdtdBindGroup);
+        computePass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdClearPipeline);
+        computePass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         
         // Calculate workgroup counts to cover the entire texture
         const texWidth = this.bufferManager.fdtdBuffers.ezBuffer.width;

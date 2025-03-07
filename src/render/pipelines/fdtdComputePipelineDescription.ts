@@ -1,90 +1,85 @@
-import computeKernel from "../gpu/shaders/computeKernel.wgsl"
-import screenShader from "../gpu/shaders/screenShader.wgsl"
-import fdtdKernel from "../gpu/shaders/fdtdKernel.wgsl";
+import { BufferManager } from "../buffers/bufferManager";
+import fdtdKernel from "../../gpu/shaders/fdtdComputeKernel.wgsl";
 
-import { BindGroupLayouts } from "./pipelineLayouts";
-
-export class Pipelines {
+export class fdtdComputePipelineDescriptor {
 
     device: GPUDevice;
-    bindGroupLayouts!: BindGroupLayouts;
-    computePipeline!: GPUComputePipeline;
-    screenPipeline!: GPURenderPipeline;
+    bufferManager: BufferManager;
+
+    fdtdBindGroup!: GPUBindGroup;
+    fdtdBindGroup_layout!: GPUBindGroupLayout;
     fdtdPipelineH!: GPUComputePipeline;
     fdtdPipelineE!: GPUComputePipeline;
     fdtdVisualizationPipeline!: GPUComputePipeline;
     fdtdClearPipeline!: GPUComputePipeline;
 
-
-    constructor(device: GPUDevice) {
+    constructor(device: GPUDevice, bufferManager: BufferManager) {
         this.device = device;
-        this.bindGroupLayouts = new BindGroupLayouts(this.device);
-
+        this.bufferManager = bufferManager;
         this.initialize();
     }
 
-    async initialize() {
-        await this.createScreenPipeline();
-        await this.createComputePipeline();
-        await this.createFdtdPipelines();
-        this.fdtdClearPipeline = this.createClearTexturesPipeline();
+    initialize = async () => {
+        this.createFDTDBindGroupLayout();
+        await this.createFDTDBindGroup();
+        await this.createFDTDPipelines();
     }
-
-    createComputePipeline = async () => {
-        const computeBindGroupLayout = this.bindGroupLayouts.createComputeBindGroupLayout();
-        const computePipeline_layout = this.device.createPipelineLayout({
-            bindGroupLayouts: [computeBindGroupLayout]
-        });
-
-        this.computePipeline = 
-            this.device.createComputePipeline(
+    
+    createFDTDBindGroupLayout = () => {
+        this.fdtdBindGroup_layout = this.device.createBindGroupLayout({
+            label: "FDTD Bind Group Layout",
+            entries: [
                 {
-                    label: "Diffraction Grating Simulation Pipeline",
-                    layout: computePipeline_layout,
-            
-                    compute: {
-                        module: this.device.createShaderModule({code: computeKernel,}),
-                        entryPoint: 'main',
-                    },
+                    binding: 0,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "read-write",
+                        format: "r32float",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 1,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "read-write",
+                        format: "r32float",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 2,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "read-write",
+                        format: "r32float",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 3,
+                    visibility: GPUShaderStage.COMPUTE,
+                    storageTexture: {
+                        access: "write-only",
+                        format: "rgba8unorm",
+                        viewDimension: "2d"
+                    }
+                },
+                {
+                    binding: 4,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "uniform",
+                    }
                 }
-            );
-        }
-
-    createScreenPipeline = async () => {
-        const screenBindGroupLayout = this.bindGroupLayouts.createScreenBindGroupLayout();
-        const screen_pipeline_layout = this.device.createPipelineLayout({
-            bindGroupLayouts: [screenBindGroupLayout]
+            ]
         });
-
-        this.screenPipeline = this.device.createRenderPipeline({
-            label: "Screen Pipeline",
-            layout: screen_pipeline_layout,
-            
-            vertex: {
-                module: this.device.createShaderModule({
-                                    code: screenShader, 
-                                }),
-                entryPoint: 'vert_main',
-            },
-
-            fragment: {
-                module: this.device.createShaderModule({
-                                    code: screenShader,
-                                }),
-                entryPoint: 'frag_main',
-                targets: [
-                {
-                    format: "bgra8unorm"
-                }]
-            },
-            primitive: {
-                topology: "triangle-list"
-            }
-        });
+        return this.fdtdBindGroup_layout;
     }
 
-    createFdtdPipelines = async () => {
-        const fdtdBindGroupLayout = this.bindGroupLayouts.createFdtdBindGroupLayout();
+
+    createFDTDPipelines = async () => {
+        const fdtdBindGroupLayout = this.fdtdBindGroup_layout;
         const fdtdPipeline_layout = this.device.createPipelineLayout({
             bindGroupLayouts: [fdtdBindGroupLayout]
         });
@@ -126,8 +121,43 @@ export class Pipelines {
         });
     }
 
+
+    createFDTDBindGroup = async () => {
+        const bindGroupLayout = this.fdtdBindGroup_layout;
+        
+        this.fdtdBindGroup = this.device.createBindGroup({
+            label: "FDTD Bind Group",
+            layout: bindGroupLayout,
+            entries: [
+                {
+                    binding: 0,
+                    resource: this.bufferManager.fdtdBuffers.ezBufferView
+                },
+                {
+                    binding: 1,
+                    resource: this.bufferManager.fdtdBuffers.hxBufferView
+                },
+                {
+                    binding: 2,
+                    resource: this.bufferManager.fdtdBuffers.hyBufferView
+                },
+                {
+                    binding: 3,
+                    resource: this.bufferManager.fdtdBuffers.fieldVisualizationView
+                },
+                {
+                    binding: 4,
+                    resource: {
+                        buffer: this.bufferManager.uniformBuffer.gpuBuffer,
+                    }
+                }
+            ]
+        });
+    }
+
+
     createClearTexturesPipeline() {
-        const fdtdBindGroupLayout = this.bindGroupLayouts.createFdtdBindGroupLayout();
+        const fdtdBindGroupLayout = this.fdtdBindGroup_layout;
         const clearPipeline_layout = this.device.createPipelineLayout({
             bindGroupLayouts: [fdtdBindGroupLayout]
         });
