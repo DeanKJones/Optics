@@ -148,18 +148,6 @@ export class App
                 sliderContainer.style.marginTop = '20px';
             }
         }
-
-        // Update settings when sliders change and vice versa
-        //const updateInterval = setInterval(() => {
-        //    // Update wavelength slider to match settings (if manual changes occur)
-        //    const wavelengthCurrentValue = this.settings.getWavelengthNm();
-        //    if (Math.abs(parseFloat(wavelengthSlider.value) - wavelengthCurrentValue) > 1) {
-        //        wavelengthSlider.value = wavelengthCurrentValue.toString();
-        //        wavelengthValue.textContent = `${wavelengthCurrentValue.toFixed(0)} nm`;
-        //    }
-        //    
-        //    // Similar updates for other sliders if needed
-        //}, 1000); // Check once per second
     }
 
     run = () => {
