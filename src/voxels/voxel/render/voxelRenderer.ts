@@ -1,9 +1,9 @@
 // src/voxel/render/voxelRenderer.ts
 import { VoxelSceneManager } from "../scene/voxelSceneManager";
 import { VoxelSettings } from "../settings/voxelSettings";
-import voxelVertexShader from "../../../gpu/shaders/voxelVertex.wgsl";
-import voxelFragmentShader from "../../../gpu/shaders/voxelFragment.wgsl";
-import { mat4 } from 'gl-matrix'; // Add this import
+import voxelVertexShader from "../../../gpu/shaders/Voxels/voxelVertex.wgsl";
+import voxelFragmentShader from "../../../gpu/shaders/Voxels/voxelFragment.wgsl";
+import { mat4 } from 'gl-matrix';
 
 export class VoxelRenderer {
     canvas: HTMLCanvasElement;
