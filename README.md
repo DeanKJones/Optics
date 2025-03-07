@@ -20,6 +20,11 @@ The goal is to have simulations that are based on solving Maxwell's equations us
 
 - **Diffraction Grating Simulation**: Visualize the interference pattern behind a set diffraction grid.
 ![](assets/embedded/Interference.gif)
+
+- **FDTD Simulation**: Still a work in progress simulation editor.
+There is a selection toggle on the bottom right of the window
+![](assets/embedded/fdtd.gif)
+
 - **Spectral Passes**: `TODO` Spectral passes.
 
 ## Installation
