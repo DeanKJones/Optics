@@ -39,8 +39,6 @@ export class BufferManager {
                 uniformBufferParams.grateWidth,     // Direct grate width in mm
                 uniformBufferParams.numberOfSlits,
                 uniformBufferParams.screenSize,
-                uniformBufferParams.redWavelength,  // Direct red wavelength in nm
-                uniformBufferParams.blueWavelength  // Direct blue wavelength in nm
             ]));
     }
 }

@@ -15,8 +15,6 @@ struct SimulationParameters {
     grateWidth: f32,               // Total width of the diffraction grating in mm
     numberOfSlits: f32,            // Number of slits in the diffraction grating
     viewportScale: f32,            // Scale factor for the simulation viewport
-    redWavelength: f32,            // Red wavelength in nm
-    blueWavelength: f32,           // Blue wavelength in nm
 }
 
 // Physical constants

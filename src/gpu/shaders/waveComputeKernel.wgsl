@@ -16,8 +16,6 @@ struct uniformBufferStruct {
     grateWidth: f32,        // In millimeters
     numberOfSlits: f32,
     screenSizeMultiplier: f32,
-    redWavelength: f32,     // In nanometers
-    blueWavelength: f32     // In nanometers
 }
 
 // Helper function to convert wavelength in nm to simulation frequency

@@ -6,8 +6,6 @@ export class UniformSettings {
     grateWidth: number = 0.3;          // In millimeters
     numberOfSlits: number = 10.0;
     screenSize: number = 1.0;
-    redWavelength: number = 700.0;     // In nanometers
-    blueWavelength: number = 400.0;    // In nanometers
     
     constructor(){
         this.deltaTime = 0.0;
@@ -16,8 +14,6 @@ export class UniformSettings {
         this.grateWidth = 0.3;         // 0.3mm
         this.numberOfSlits = 10.0;
         this.screenSize = 1.0;
-        this.redWavelength = 700.0;
-        this.blueWavelength = 400.0;
     }
     
     // No conversion needed anymore - direct accessors
