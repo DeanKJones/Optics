@@ -87,7 +87,7 @@ export class Renderer {
             return;
         }
         
-        this.bufferManager.updateUniformBuffer(pUniformBufferSettings);
+        this.bufferManager.uniformBuffer.updateBuffer(pUniformBufferSettings);
         
         if (this.useFdtdSimulation) {
             this.renderFdtdSimulation();
