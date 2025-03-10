@@ -1,5 +1,5 @@
 import { BufferManager } from "../buffers/bufferManager";
-import { computePipelineDescriptor } from "./simpleComputePipelineDescription";
+import { computePipelineDescriptor } from "./waveOpticsComputePipelineDescription";
 import { screenPipelineDescriptor } from "./screenPipelineDescription";
 import { fdtdComputePipelineDescriptor } from "./fdtdComputePipelineDescription";
 

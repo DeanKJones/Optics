@@ -1,5 +1,5 @@
 import { BufferManager } from "../buffers/bufferManager";
-import computeKernel from "../../gpu/shaders/waveComputeKernel.wgsl"
+import computeKernel from "../../gpu/shaders/waveOptics/waveCompute.wgsl";
 
 export class computePipelineDescriptor {
     device: GPUDevice;
