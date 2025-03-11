@@ -77,9 +77,26 @@
     <div id="key-label"></div>
     
     <!-- Navigation moved to bottom left -->
+    <!-- Navigation moved to bottom left -->
     <div class="nav-header">
-        <a href="index.html" class="active">Optics</a>
+        <a href="#" onclick="switchMode('wave'); return false;" class="active" id="nav-optics">Optics</a>
+        <a href="#" onclick="switchMode('voxelspace'); return false;" id="nav-voxelspace">VoxelSpace</a>
     </div>
+    
+    <script>
+        // Function to switch between different visualization modes
+        function switchMode(mode) {
+            // Update navigation buttons
+            document.getElementById('nav-optics').classList.toggle('active', mode === 'wave');
+            document.getElementById('nav-voxelspace').classList.toggle('active', mode === 'voxelspace');
+            
+            // This will get replaced when the app initializes
+            if (window.app && window.app.ui) {
+                window.app.ui.setMode(mode);
+                window.app.renderer.setRenderMode(mode);
+            }
+        }
+    </script>
     
     <script src="dist/main.js"></script>
 </body>
