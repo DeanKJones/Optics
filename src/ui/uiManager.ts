@@ -21,7 +21,6 @@ export class UIManager {
     // Shared UI elements
     private controlPanel: HTMLDivElement;
     private settingsCanvas: HTMLCanvasElement | undefined;
-    private keyInstructions: HTMLDivElement;
     
     // Current active mode
     private currentMode: 'wave' | 'fdtd' | 'voxelspace' = 'wave';
@@ -50,7 +49,6 @@ export class UIManager {
         
         // Setup shared UI components
         this.controlPanel = this.createControlPanel(onRenderModeToggle, onResetSimulation);
-        this.keyInstructions = this.createKeyInstructions();
         
         // Initialize render context UI
         this.renderContextUI = new RenderContextUI(this.renderContext);
@@ -156,60 +154,67 @@ export class UIManager {
         return controlPanel;
     }
     
-    /**
-     * Create the key instructions display
-     */
-    private createKeyInstructions(): HTMLDivElement {
-        const instructions = document.createElement('div');
-        instructions.className = 'key-instructions';
-        instructions.style.position = 'fixed';
-        instructions.style.left = '10px';
-        instructions.style.top = '10px';
-        instructions.style.backgroundColor = 'rgba(0,0,0,0.6)';
-        instructions.style.padding = '5px';
-        instructions.style.borderRadius = '3px';
-        instructions.style.display = 'none';
-        document.body.appendChild(instructions);
-        return instructions;
-    }
     
     /**
      * Set the active mode and update UI accordingly
      */
     public setMode(mode: 'wave' | 'fdtd' | 'voxelspace'): void {
         this.currentMode = mode;
-        
+
         // Update render context
         this.renderContext.setRenderMode(mode);
-        
+
         // Update button states
         const buttons = this.controlPanel.querySelectorAll('a');
         buttons.forEach((button, i) => {
-            if ((mode === 'wave' && i === 0) || 
-                (mode === 'fdtd' && i === 1) || 
-                (mode === 'voxelspace' && i === 2)) {
-                button.classList.add('active');
-            } else if (i < 3) { // Skip the reset button
-                button.classList.remove('active');
-            }
+        if ((mode === 'wave' && i === 0) || 
+            (mode === 'fdtd' && i === 1) || 
+            (mode === 'voxelspace' && i === 2)) {
+            button.classList.add('active');
+        } else if (i < 3) { // Skip the reset button
+            button.classList.remove('active');
+        }
         });
-        
+
         // Show/hide reset button based on mode
         const resetButton = document.getElementById('reset-sim-button');
         if (resetButton) {
-            resetButton.style.display = mode === 'fdtd' ? 'inline-block' : 'none';
+        resetButton.style.display = mode === 'fdtd' ? 'inline-block' : 'none';
         }
-        
-        // Show/hide key instructions
+
+        // Update parameters box title and content based on mode
+        const parametersBox = document.getElementById('parameters-box');
+        const parametersHeader = parametersBox?.querySelector('.parameters-header');
+        //const parametersContent = parametersBox?.querySelector('.parameters-content');
+
+        if (parametersBox && parametersHeader) {
         if (mode === 'voxelspace') {
-            this.keyInstructions.innerHTML = 'VoxelSpace Controls: W/S - Move, A/D - Turn, Q/E - Height';
-            this.keyInstructions.style.top = 'auto';
-            this.keyInstructions.style.bottom = '65px';
-            this.keyInstructions.style.display = 'block';
+            // Hide the parameter sliders for voxelSpace mode
+            parametersHeader.innerHTML = `
+                <h2>VoxelSpace Controls</h2>
+                <p class="description">Use keyboard to navigate: W/S - Move, A/D - Turn, Q/E - Height</p>
+            `;
+            
+            // Hide the parameter groups
+            const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
+            parameterGroups.forEach(group => {
+                (group as HTMLElement).style.display = 'none';
+            });
         } else {
-            this.keyInstructions.style.display = 'none';
+            // Restore wave/FDTD parameters UI
+            parametersHeader.innerHTML = `
+                <h2>${mode === 'fdtd' ? 'FDTD' : 'Wave'} Simulation Parameters</h2>
+                <p class="description">Adjust the parameters of the ${mode === 'fdtd' ? 'FDTD simulation' : 'light wave and diffraction grating'}</p>
+            `;
+            
+            // Show the parameter groups
+            const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
+            parameterGroups.forEach(group => {
+                (group as HTMLElement).style.display = 'block';
+            });
         }
-        
+        }
+
         // Update UI components
         this.updateUI();
     }
