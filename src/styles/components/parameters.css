@@ -1,53 +1,100 @@
 /* Parameter Box Styling */
 .parameters-box {
-    background-color: #242424;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-  }
-  
-  .parameters-header {
-    margin-bottom: 16px;
+    position: fixed;
+    top: 70px; /* Moved down from 20px */
+    right: 0;
+    background-color: rgba(36, 36, 36, 0.85);
+    border-radius: 8px 0 0 8px;
+    padding: 12px; /* Reduced from 16px */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    max-width: 280px; /* Reduced from 350px */
+    width: auto; /* Allow the box to shrink based on content */
+    backdrop-filter: blur(5px);
+    transition: transform 0.1s ease-in-out;
+    z-index: 100;
+    pointer-events: auto;
+    cursor: pointer; /* Indicates it's clickable */
+}
+
+/* Collapsed state - make it a small tab on the right */
+.parameters-box.collapsed {
+    transform: translateX(calc(100% - 20px));
+    border-radius: 20px 0 0 20px;
+    padding: 24px; /* Reduced from 12px */
+    cursor: pointer;
+}
+
+/* Visual indicator for tab */
+.parameters-box:before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    height: 30px;
+    width: 3px;
+    background-color: rgba(79, 133, 214, 0.7);
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 3px;
+    opacity: 0%;
+    transition: opacity 0.1s ease;
+}
+
+.parameters-box.collapsed:before {
+    opacity: 90%;
+}
+
+/* Content container */
+.parameters-content {
+    overflow-y: auto;
+    max-height: 60vh; /* Reduced from 80vh */
+    padding-right: 5px;
+}
+
+/* Make sure sliders and inputs don't inherit the container's cursor */
+.parameter-group,
+input[type="range"],
+.slider-container {
+    cursor: default;
+}
+
+/* Rest of your parameters styles with slight size reductions... */
+.parameters-header {
+    margin-bottom: 10px; /* Reduced from 16px */
     border-bottom: 1px solid #3a3a3a;
-    padding-bottom: 8px;
-  }
-  
-  .parameters-header h2 {
+    padding-bottom: 6px; /* Reduced from 8px */
+    padding-left: 12px; /* Reduced from 15px */
+}
+
+.parameters-header h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px; /* Reduced from 18px */
     color: #e0e0e0;
-  }
-  
-  .parameters-header .description {
-    margin: 5px 0 0;
-    font-size: 12px;
+}
+
+.parameters-header .description {
+    margin: 3px 0 0; /* Reduced from 5px */
+    font-size: 11px; /* Reduced from 12px */
     color: #aaa;
-  }
-  
-  .parameter-group {
-    margin: 16px 0;
-    padding: 8px;
+}
+
+.parameter-group {
+    margin: 12px 0; /* Reduced from 16px */
+    padding: 6px; /* Reduced from 8px */
     border-radius: 4px;
     background-color: #2a2a2a;
-  }
-  
-  .parameter-group:hover {
-    background-color: #333333;
-  }
-  
-  .parameter-name {
+}
+
+.parameter-name {
     display: block;
     font-weight: bold;
     color: #e0e0e0;
-    margin-bottom: 4px;
-  }
-  
-  .parameter-description {
+    margin-bottom: 3px; /* Reduced from 4px */
+}
+
+.parameter-description {
     display: block;
-    font-size: 11px;
+    font-size: 10px; /* Reduced from 11px */
     color: #aaa;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
+    margin-bottom: 6px; /* Reduced from 8px */
+    line-height: 1.2; /* Reduced from 1.3 */
+}
