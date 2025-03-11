@@ -1,4 +1,4 @@
-import { UniformSettings } from "../render/layouts/uniformBufferSettings";
+import { OpticsUniformSettings } from "../render/layouts/opticsUniformSettings";
 
 /**
  * Sets up a slider element with event listener
@@ -144,7 +144,7 @@ export function setButtonActive(controlPanel: HTMLDivElement, buttonIndex: numbe
 /**
  * Render the settings on a canvas
  */
-export function renderSettingsUI(canvas: HTMLCanvasElement | undefined, settings: UniformSettings): void {
+export function renderSettingsUI(canvas: HTMLCanvasElement | undefined, settings: OpticsUniformSettings): void {
     if (canvas) {
         const ctx = canvas.getContext("2d");
         if (ctx) {

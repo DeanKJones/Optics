@@ -1,4 +1,4 @@
-export class UniformSettings {
+export class OpticsUniformSettings {
     // Store directly as real-world values
     deltaTime: number = 0.0;
     wavelength: number = 500.0;        // In nanometers
@@ -41,7 +41,7 @@ export class UniformSettings {
         this.grateWidth = widthMm;
     }
     
-    update(pSettings: UniformSettings) {
+    update(pSettings: OpticsUniformSettings) {
         this.deltaTime = pSettings.deltaTime;
         this.wavelength = pSettings.wavelength;
         this.slitWidth = pSettings.slitWidth;

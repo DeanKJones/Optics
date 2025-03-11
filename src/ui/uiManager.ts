@@ -1,41 +1,47 @@
-import { UniformSettings } from "../render/layouts/uniformBufferSettings";
-import { 
-    setupSlider, 
-    createControlPanel, 
-    setupSettingsDisplay, 
-    updateValueDisplay, 
-    setSliderValue, 
-    setButtonActive,
-    renderSettingsUI
-} from './uiUtilities';
+import { EventSystem } from "../events/eventSystem";
+import { SettingsManager } from "../settings/settingsManager";
+import { OpticsSettingsUI } from "../settings/opticsSettingsUI";
+import { VoxelSpaceSettingsUI } from "../settings/voxelSpaceSettingsUI";
 
 /**
- * Manages all UI elements and their interactions with simulation settings
+ * Manages UI components and coordinates between different settings UIs
  */
 export class UIManager {
-    // Core settings and callbacks
-    private settings: UniformSettings;
-    private onFdtdToggle: (isEnabled: boolean) => void;
-    private onResetSimulation: () => void;
-
-    // UI element references
-    private sliders: Map<string, HTMLInputElement | null> = new Map();
-    private valueDisplays: Map<string, HTMLSpanElement | null> = new Map();
-    private controlPanel!: HTMLDivElement;
+    // Core systems
+    private settingsManager: SettingsManager;
+    private eventSystem: EventSystem;
+    
+    // UI components for different settings
+    private opticsUI: OpticsSettingsUI;
+    private voxelSpaceUI: VoxelSpaceSettingsUI;
+    
+    // Shared UI elements
+    private controlPanel: HTMLDivElement;
     private settingsCanvas: HTMLCanvasElement | undefined;
+    private keyInstructions: HTMLDivElement;
+    
+    // Current active mode
+    private currentMode: 'wave' | 'fdtd' | 'voxelspace' = 'wave';
 
     constructor(
-        settings: UniformSettings,
         settingsCanvas: HTMLCanvasElement | undefined,
-        onFdtdToggle: (isEnabled: boolean) => void,
+        onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace') => void,
         onResetSimulation: () => void
     ) {
-        this.settings = settings;
+        // Initialize core systems
+        this.settingsManager = SettingsManager.getInstance();
+        this.eventSystem = EventSystem.getInstance();
         this.settingsCanvas = settingsCanvas;
-        this.onFdtdToggle = onFdtdToggle;
-        this.onResetSimulation = onResetSimulation;
         
-        // Initialize UI components using utility functions
+        // Create UI components for different settings types
+        this.opticsUI = new OpticsSettingsUI(this.settingsManager.optics);
+        this.voxelSpaceUI = new VoxelSpaceSettingsUI(this.settingsManager.voxelSpace);
+        
+        // Setup shared UI components
+        this.controlPanel = this.createControlPanel(onRenderModeToggle, onResetSimulation);
+        this.keyInstructions = this.createKeyInstructions();
+        
+        // Initialize UI
         this.initializeUI();
     }
     
@@ -43,114 +49,163 @@ export class UIManager {
      * Initialize all UI components
      */
     private initializeUI(): void {
-        // Set up sliders
-        this.initializeSliders();
+        // Set up canvas for settings display
+        if (this.settingsCanvas) {
+            this.settingsCanvas.width = 250;
+            this.settingsCanvas.height = 220;
+            this.settingsCanvas.style.border = '1px solid #333';
+            this.settingsCanvas.style.marginLeft = '10px';
+            this.settingsCanvas.style.marginBottom = '10px';
+        }
         
-        // Set up control panel using utility function
-        this.controlPanel = createControlPanel(this.onFdtdToggle, this.onResetSimulation);
-        
-        // Set up settings display using utility function
-        setupSettingsDisplay(this.settingsCanvas);
+        // Initialize UI components
+        this.opticsUI.initialize();
+        this.voxelSpaceUI.initialize();
         
         // Initial UI update
-        this.updateUIFromSettings();
+        this.updateUI();
     }
     
     /**
-     * Initialize all slider controls
+     * Create the main control panel with mode selection buttons
      */
-    private initializeSliders(): void {
-        // Set up wavelength slider
-        const wavelength = setupSlider(
-            "wavelength-slider",
-            "wavelength-value",
-            (value) => {
-                this.settings.setWavelengthNm(value);
-                updateValueDisplay(this.valueDisplays.get("wavelength") || null, `${value.toFixed(0)} nm`);
-            }
-        );
-        this.sliders.set("wavelength", wavelength.slider);
-        this.valueDisplays.set("wavelength", wavelength.valueDisplay);
+    private createControlPanel(
+        onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace') => void,
+        onResetSimulation: () => void
+    ): HTMLDivElement {
+        const controlPanel = document.createElement('div');
+        controlPanel.className = 'nav-header';
+        controlPanel.style.left = 'auto';
+        controlPanel.style.right = '10px';
+        controlPanel.style.bottom = '10px';
+        document.body.appendChild(controlPanel);
         
-        // Set up slit width slider
-        const slitWidth = setupSlider(
-            "slit-width-slider",
-            "slit-width-value",
-            (value) => {
-                this.settings.setSlitWidthMm(value);
-                updateValueDisplay(this.valueDisplays.get("slitWidth") || null, `${value.toFixed(3)} mm`);
-            }
-        );
-        this.sliders.set("slitWidth", slitWidth.slider);
-        this.valueDisplays.set("slitWidth", slitWidth.valueDisplay);
+        // Create mode buttons with common structure
+        const createModeButton = (
+            label: string, 
+            mode: 'wave' | 'fdtd' | 'voxelspace',
+            shortcut: string,
+            isActive: boolean = false
+        ) => {
+            const button = document.createElement('a');
+            button.href = '#';
+            button.innerText = `${label} (${shortcut})`;
+            if (isActive) button.classList.add('active');
+            
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setMode(mode);
+                onRenderModeToggle(mode);
+            });
+            
+            controlPanel.appendChild(button);
+            return button;
+        };
         
-        // Set up grate width slider
-        const grateWidth = setupSlider(
-            "grate-width-slider",
-            "grate-width-value",
-            (value) => {
-                this.settings.setGrateWidthMm(value);
-                updateValueDisplay(this.valueDisplays.get("grateWidth") || null, `${value.toFixed(2)} mm`);
-            }
-        );
-        this.sliders.set("grateWidth", grateWidth.slider);
-        this.valueDisplays.set("grateWidth", grateWidth.valueDisplay);
+        // Create the mode buttons
+        createModeButton('Wave', 'wave', '1', true);
+        createModeButton('FDTD', 'fdtd', '2');
+
+        // Reset simulation button
+        const resetButton = document.createElement('a');
+        resetButton.href = '#';
+        resetButton.innerText = 'Reset Sim (R)';
+        resetButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetButton.classList.add('active');
+            setTimeout(() => resetButton.classList.remove('active'), 300);
+            onResetSimulation();
+        });
+        controlPanel.appendChild(resetButton);
         
-        // Set up number of slits slider
-        const numberOfSlits = setupSlider(
-            "number-of-slits-slider",
-            "number-of-slits-value",
-            (value) => {
-                this.settings.numberOfSlits = value;
-                updateValueDisplay(this.valueDisplays.get("numberOfSlits") || null, `${value.toFixed(0)}`);
+        // Set up keyboard shortcuts
+        this.eventSystem.on('keydown', (event: KeyboardEvent) => {
+            switch (event.code) {
+                case 'Digit1': 
+                    this.setMode('wave');
+                    onRenderModeToggle('wave');
+                    break;
+                case 'Digit2': 
+                    this.setMode('fdtd');
+                    onRenderModeToggle('fdtd');
+                    break;
+                case 'KeyR': 
+                    onResetSimulation();
+                    break;
             }
-        );
-        this.sliders.set("numberOfSlits", numberOfSlits.slider);
-        this.valueDisplays.set("numberOfSlits", numberOfSlits.valueDisplay);
+        });
         
-        // Set up screen size slider
-        const screenSize = setupSlider(
-            "screen-size-mult-slider",
-            "screen-size-mult-value",
-            (value) => {
-                this.settings.screenSize = value;
-                updateValueDisplay(this.valueDisplays.get("screenSize") || null, `${value.toFixed(1)}`);
-            }
-        );
-        this.sliders.set("screenSize", screenSize.slider);
-        this.valueDisplays.set("screenSize", screenSize.valueDisplay);
+        return controlPanel;
     }
     
     /**
-     * Update UI elements based on current settings values
+     * Create the key instructions display
      */
-    public updateUIFromSettings(): void {
-        // Update all value displays using utility function
-        updateValueDisplay(this.valueDisplays.get("wavelength") || null, `${this.settings.getWavelengthNm().toFixed(0)} nm`);
-        updateValueDisplay(this.valueDisplays.get("slitWidth") || null, `${this.settings.getSlitWidthMm().toFixed(3)} mm`);
-        updateValueDisplay(this.valueDisplays.get("grateWidth") || null, `${this.settings.getGrateWidthMm().toFixed(2)} mm`);
-        updateValueDisplay(this.valueDisplays.get("numberOfSlits") || null, `${this.settings.numberOfSlits.toFixed(0)}`);
-        updateValueDisplay(this.valueDisplays.get("screenSize") || null, `${this.settings.screenSize.toFixed(1)}`);
+    private createKeyInstructions(): HTMLDivElement {
+        const instructions = document.createElement('div');
+        instructions.className = 'key-instructions';
+        instructions.style.position = 'fixed';
+        instructions.style.left = '10px';
+        instructions.style.top = '10px';
+        instructions.style.backgroundColor = 'rgba(0,0,0,0.6)';
+        instructions.style.padding = '5px';
+        instructions.style.borderRadius = '3px';
+        instructions.style.display = 'none';
+        document.body.appendChild(instructions);
+        return instructions;
+    }
+    
+    /**
+     * Set the active mode and update UI accordingly
+     */
+    public setMode(mode: 'wave' | 'fdtd' | 'voxelspace'): void {
+        this.currentMode = mode;
         
-        // Update slider positions using utility function
-        setSliderValue(this.sliders.get("wavelength") || null, this.settings.getWavelengthNm());
-        setSliderValue(this.sliders.get("slitWidth") || null, this.settings.getSlitWidthMm());
-        setSliderValue(this.sliders.get("grateWidth") || null, this.settings.getGrateWidthMm());
-        setSliderValue(this.sliders.get("numberOfSlits") || null, this.settings.numberOfSlits);
-        setSliderValue(this.sliders.get("screenSize") || null, this.settings.screenSize);
+        // Update button states
+        const buttons = this.controlPanel.querySelectorAll('a');
+        buttons.forEach((button, i) => {
+            if ((mode === 'wave' && i === 0) || 
+                (mode === 'fdtd' && i === 1) || 
+                (mode === 'voxelspace' && i === 2)) {
+                button.classList.add('active');
+            } else if (i < 3) { // Skip the reset button
+                button.classList.remove('active');
+            }
+        });
+        
+        // Show/hide key instructions
+        if (mode === 'voxelspace') {
+            this.keyInstructions.innerHTML = 'VoxelSpace Controls: W/S - Move, A/D - Turn, Q/E - Height';
+            this.keyInstructions.style.display = 'block';
+        } else {
+            this.keyInstructions.style.display = 'none';
+        }
+        
+        // Update UI components
+        this.updateUI();
     }
     
     /**
-     * Set the active state of the FDTD toggle button
+     * Update all UI elements based on current settings
      */
-    public setFdtdActive(active: boolean): void {
-        setButtonActive(this.controlPanel, 1, active);
-    }
-    
-    /**
-     * Render the settings information on the canvas
-     */
-    public renderSettingsUI(): void {
-        renderSettingsUI(this.settingsCanvas, this.settings);
+    public updateUI(): void {
+        // Delegate to appropriate UI component based on mode
+        if (this.settingsCanvas && this.settingsCanvas.getContext('2d')) {
+            const ctx = this.settingsCanvas.getContext('2d')!;
+            ctx.clearRect(0, 0, this.settingsCanvas.width, this.settingsCanvas.height);
+            
+            if (this.currentMode === 'voxelspace') {
+                this.voxelSpaceUI.renderUI(ctx);
+            } else {
+                this.opticsUI.renderUI(ctx);
+            }
+        }
+        
+        // Update slider values
+        if (this.currentMode === 'voxelspace') {
+            this.voxelSpaceUI.updateControls();
+        } else {
+            this.opticsUI.updateControls();
+        }
     }
 }
