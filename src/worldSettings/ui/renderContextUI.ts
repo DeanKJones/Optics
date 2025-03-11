@@ -49,6 +49,10 @@ export class RenderContextUI {
                     <span class="stat-name">Resolution:</span>
                     <span class="stat-value" id="resolution-value">-</span>
                 </div>
+                <div class="render-stat">
+                    <span class="stat-name">Texture Resolution:</span>
+                    <span class="stat-value" id="texture-resolution-value">-</span>
+                </div>
                 <div id="custom-metrics"></div>
             </div>
         `;
@@ -85,6 +89,17 @@ export class RenderContextUI {
         
         const res = this.context.getResolution();
         this.updateElement('resolution-value', `${res.width}×${res.height}`);
+
+        this.updateElement('texture-resolution-value', `[-]`);
+        if (this.context.getRenderMode() == 'voxelspace') {
+            this.updateElement('texture-resolution-value', `${1024}×${1024}`);
+        }
+        if (this.context.getRenderMode() == 'fdtd') {
+            this.updateElement('texture-resolution-value', `${res.width * 2}×${res.height * 2}`);
+        }
+        if (this.context.getRenderMode() == 'wave') {
+            this.updateElement('texture-resolution-value', `${res.width * 4}×${res.height * 4}`);
+        }
         
         // Update custom metrics
         this.updateCustomMetrics();
