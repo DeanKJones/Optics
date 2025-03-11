@@ -1,6 +1,6 @@
-import { UniformSettings } from "../layouts/uniformBufferSettings";
+import { OpticsUniformSettings } from "../../layouts/opticsUniformSettings";
 
-export class UniformBufferDescription {
+export class OpticsUniformBufferDescription {
 
     device: GPUDevice;
     canvas: HTMLCanvasElement;
@@ -17,14 +17,14 @@ export class UniformBufferDescription {
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           });
         
-        this.writeDefaultBuffers(new UniformSettings());
+        this.writeDefaultBuffers(new OpticsUniformSettings());
     }
 
-    writeDefaultBuffers = (uniformBufferParams: UniformSettings) => {
+    writeDefaultBuffers = (uniformBufferParams: OpticsUniformSettings) => {
         this.updateBuffer(uniformBufferParams);
     }
 
-    updateBuffer = (uniformBufferParams: UniformSettings) => {
+    updateBuffer = (uniformBufferParams: OpticsUniformSettings) => {
         this.device.queue.writeBuffer(this.gpuBuffer, 0, 
             new Float32Array([
                 uniformBufferParams.deltaTime,

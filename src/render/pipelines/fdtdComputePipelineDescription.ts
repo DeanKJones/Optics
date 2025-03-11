@@ -164,7 +164,7 @@ export class fdtdComputePipelineDescriptor {
                 {
                     binding: 4,
                     resource: {
-                        buffer: this.bufferManager.uniformBuffer.gpuBuffer,
+                        buffer: this.bufferManager.opticsUniformBuffer.gpuBuffer,
                     }
                 }
             ]

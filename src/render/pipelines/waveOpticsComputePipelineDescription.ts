@@ -62,7 +62,7 @@ export class computePipelineDescriptor {
                 {
                     binding: 1,
                     resource: {
-                        buffer: this.bufferManager.uniformBuffer.gpuBuffer,
+                        buffer: this.bufferManager.opticsUniformBuffer.gpuBuffer,
                     }
                 },
             ]
