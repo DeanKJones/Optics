@@ -1,0 +1,26 @@
+#container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+  }
+  
+  #canvas-container {
+    display: flex;
+    width: 100%;
+    flex: 1;
+  }
+  
+  #scene-params {
+    flex: 1;
+  }
+  
+  #divider {
+    width: 5px;
+    background-color: #4f85d6;
+    cursor: ew-resize;
+  }
+  
+  #key-label, #mouse-position {
+    margin-top: 10px;
+  }

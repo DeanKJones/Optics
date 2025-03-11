@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bean's Maxwell Playground</title>
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="src/style.css">
+    <link rel="stylesheet" href="src/styles/main.css">
     <style>
         .nav-header {
             background-color: rgba(51, 51, 51, 0.8);
@@ -45,34 +45,69 @@
         <div id="divider"></div>
         <div id="scene-container" style="flex: 15; background-color: rgb(29, 28, 28);">
             <canvas id="settings"></canvas>
-            <h2 for="settings">_Sliders</h2>
-            <div id="settings-slider-container">
-                <label for="wavelength-slider">___Wavelength (nm)</label>
-                <input type="range" id="wavelength-slider" min="100" max="1000" value="500" step="10">
-                <span id="wavelength-value">500 nm</span>
-                <div id="divider"></div>
-
-                <label for="slit-width-slider">___Slit Width (mm)</label>
-                <input type="range" id="slit-width-slider" min="0.001" max="0.050" value="0.005" step="0.001">
-                <span id="slit-width-value">0.005 mm</span>
-                <div id="divider"></div>
-
-                <label for="grate-width-slider">___Grate Width (mm)</label>
-                <input type="range" id="grate-width-slider" min="0.05" max="1.5" value="0.40" step="0.01">
-                <span id="grate-width-value">0.30 mm</span>
-                <div id="divider"></div>
-
-                <label for="number-of-slits-slider">___Number of Slits</label>
-                <input type="range" id="number-of-slits-slider" min="1.0" max="25.0" value="10.0" step="1.0">
-                <span id="number-of-slits-value">10</span>
-                <div id="divider"></div>
-
-                <label for="screen-size-mult-slider">___Screen Size Mult</label>
-                <input type="range" id="screen-size-mult-slider" min="1.0" max="5.0" value="1.0" step="0.1">
-                <span id="screen-size-mult-value">1.0</span>
+            
+            <div class="parameters-box">
+                <div class="parameters-header">
+                    <h2>Wave Properties</h2>
+                    <p class="description">Adjust the parameters of the light wave and diffraction grating</p>
+                </div>
+                
+                <div class="parameter-group">
+                    <label for="wavelength-slider">
+                        <span class="parameter-name">Wavelength</span>
+                        <span class="parameter-description">Controls the color of the light wave</span>
+                        <div class="slider-container">
+                            <input type="range" id="wavelength-slider" min="100" max="1000" value="500" step="10">
+                            <span id="wavelength-value" class="value-display">500 nm</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="parameter-group">
+                    <label for="slit-width-slider">
+                        <span class="parameter-name">Slit Width</span>
+                        <span class="parameter-description">Controls the width of each slit in the diffraction grating</span>
+                        <div class="slider-container">
+                            <input type="range" id="slit-width-slider" min="0.001" max="0.050" value="0.005" step="0.001">
+                            <span id="slit-width-value" class="value-display">0.005 mm</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="parameter-group">
+                    <label for="grate-width-slider">
+                        <span class="parameter-name">Grate Width</span>
+                        <span class="parameter-description">Controls the total width of the diffraction grating</span>
+                        <div class="slider-container">
+                            <input type="range" id="grate-width-slider" min="0.05" max="1.5" value="0.40" step="0.01">
+                            <span id="grate-width-value" class="value-display">0.30 mm</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="parameter-group">
+                    <label for="number-of-slits-slider">
+                        <span class="parameter-name">Number of Slits</span>
+                        <span class="parameter-description">Controls how many slits are in the diffraction grating</span>
+                        <div class="slider-container">
+                            <input type="range" id="number-of-slits-slider" min="1.0" max="25.0" value="10.0" step="1.0">
+                            <span id="number-of-slits-value" class="value-display">10</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="parameter-group">
+                    <label for="screen-size-mult-slider">
+                        <span class="parameter-name">Screen Size</span>
+                        <span class="parameter-description">Controls the visible area of the simulation</span>
+                        <div class="slider-container">
+                            <input type="range" id="screen-size-mult-slider" min="1.0" max="5.0" value="1.0" step="0.1">
+                            <span id="screen-size-mult-value" class="value-display">1.0</span>
+                        </div>
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
     
     <div id="key-label"></div>
     
@@ -82,14 +117,14 @@
         <a href="#" onclick="switchMode('wave'); return false;" class="active" id="nav-optics">Optics</a>
         <a href="#" onclick="switchMode('voxelspace'); return false;" id="nav-voxelspace">VoxelSpace</a>
     </div>
-    
+
     <script>
         // Function to switch between different visualization modes
         function switchMode(mode) {
             // Update navigation buttons
             document.getElementById('nav-optics').classList.toggle('active', mode === 'wave');
             document.getElementById('nav-voxelspace').classList.toggle('active', mode === 'voxelspace');
-            
+
             // This will get replaced when the app initializes
             if (window.app && window.app.ui) {
                 window.app.ui.setMode(mode);

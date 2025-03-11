@@ -1,0 +1,29 @@
+canvas {
+    flex: 1;
+  }
+  
+  #gfx-main {
+    flex: 3;
+  }
+  
+  #settings {
+    background-color: #1a1a1a;
+    margin-left: 10px;
+    margin-bottom: 15px;
+  }
+  
+  #settings-slider-container {
+    padding: 10px;
+    background-color: #1d1c1c;
+    border-radius: 5px;
+  }
+  
+  #settings-slider-container label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  
+  #settings-slider-container input {
+    width: 80%;
+  }
