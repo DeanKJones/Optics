@@ -1,4 +1,4 @@
-import { VoxelSpaceSettings } from "../../layouts/voxelSpaceUniformSettings";
+import { VoxelSpaceSettings } from "../../uniformDataLayouts/voxelSpaceUniformSettings";
 
 export class VoxelSpaceUniformBufferDescription {
     device: GPUDevice;

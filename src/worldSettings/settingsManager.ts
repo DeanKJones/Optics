@@ -1,5 +1,5 @@
-import { OpticsUniformSettings } from "../render/layouts/opticsUniformSettings";
-import { VoxelSpaceSettings } from "../render/layouts/voxelSpaceUniformSettings";
+import { OpticsUniformSettings } from "../render/uniformDataLayouts/opticsUniformSettings";
+import { VoxelSpaceSettings } from "../render/uniformDataLayouts/voxelSpaceUniformSettings";
 import { EventSystem } from "../events/eventSystem";
 
 export class SettingsManager {

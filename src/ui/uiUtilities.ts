@@ -1,4 +1,4 @@
-import { OpticsUniformSettings } from "../render/layouts/opticsUniformSettings";
+import { OpticsUniformSettings } from "../render/uniformDataLayouts/opticsUniformSettings";
 
 /**
  * Sets up a slider element with event listener

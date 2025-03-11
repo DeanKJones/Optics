@@ -1,6 +1,6 @@
-import { PipelineManager } from "./pipelines/pipelineManager";
+import { PipelineManager } from "./pipelineDescriptors/pipelineManager";
 import { BufferManager } from "./buffers/bufferManager";
-import { SettingsManager } from "../settings/settingsManager";
+import { SettingsManager } from "../worldSettings/settingsManager";
 
 export class Renderer {
     canvas: HTMLCanvasElement;

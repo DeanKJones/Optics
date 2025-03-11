@@ -1,7 +1,7 @@
 import { EventSystem } from "../events/eventSystem";
-import { SettingsManager } from "../settings/settingsManager";
-import { OpticsSettingsUI } from "../settings/opticsSettingsUI";
-import { VoxelSpaceSettingsUI } from "../settings/voxelSpaceSettingsUI";
+import { SettingsManager } from "../worldSettings/settingsManager";
+import { OpticsSettingsUI } from "../worldSettings/ui/opticsSettingsUI";
+import { VoxelSpaceSettingsUI } from "../worldSettings/ui/voxelSpaceSettingsUI";
 
 /**
  * Manages UI components and coordinates between different settings UIs

@@ -1,6 +1,6 @@
 import { Renderer } from "./render/renderer";
 import { UIManager } from "./ui/uiManager";
-import { SettingsManager } from "./settings/settingsManager";
+import { SettingsManager } from "./worldSettings/settingsManager";
 import { EventSystem } from "./events/eventSystem";
 
 export class App {
