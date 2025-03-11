@@ -22,8 +22,8 @@ export class FDTDBufferDescription {
         
         // Create texture buffers for EM field components with 32-bit float precision
         const size = { 
-            width: this.canvas.width * 4,  // Lower resolution than visual sim for performance
-            height: this.canvas.height * 4
+            width: this.canvas.width * 2,
+            height: this.canvas.height * 2
         };
         
         this.ezBuffer = this.createFieldBuffer(size, "r32float");
