@@ -2,6 +2,7 @@ import { Renderer } from "./render/renderer";
 import { UIManager } from "./ui/uiManager";
 import { SettingsManager } from "./worldSettings/settingsManager";
 import { EventSystem } from "./events/eventSystem";
+import { RenderContext } from "./render/renderContext";
 
 export class App {
     private canvases: Map<string, HTMLCanvasElement>;
@@ -9,8 +10,10 @@ export class App {
     public ui: UIManager;
     private renderer: Renderer;
     private settingsManager: SettingsManager;
+    private renderContext: RenderContext;
     private initialized: boolean = false;
     private lastTime: number = performance.now();
+    private frameCount: number = 0;
 
     constructor(canvases: { [key: string]: HTMLCanvasElement }) {
         this.canvases = new Map(Object.entries(canvases));
@@ -21,14 +24,18 @@ export class App {
         // Initialize settings manager
         this.settingsManager = SettingsManager.getInstance();
 
-        // Initialize renderer
-        this.renderer = new Renderer(this.canvases.get("viewportMain")!);
+        // Create render context
+        this.renderContext = new RenderContext();
         
-        // Initialize UI Manager with callbacks
+        // Initialize renderer
+        this.renderer = new Renderer(this.canvases.get("viewportMain")!, this.renderContext);
+        
+        // Initialize UI Manager with callbacks and render context
         this.uiManager = new UIManager(
             this.canvases.get("settingsMain"),
             this.handleRenderModeToggle,
-            this.handleResetSimulation
+            this.handleResetSimulation,
+            this.renderContext
         );
         this.ui = this.uiManager;
         (window as any).app = this;
@@ -37,10 +44,31 @@ export class App {
         this.renderer.Initialize().then(() => {
             this.initialized = true;
             console.log("Renderer initialized successfully");
+            
+            // Set initial render context values
+            this.updateRenderContextInitialValues();
+            
             this.run();
         }).catch(error => {
             console.error("Failed to initialize renderer:", error);
         });
+    }
+    
+    /**
+     * Set initial values for the render context
+     */
+    private updateRenderContextInitialValues(): void {
+        const canvas = this.canvases.get("viewportMain")!;
+        this.renderContext.setResolution(canvas.width, canvas.height);
+        this.renderContext.setRenderMode(this.renderer.getRenderMode());
+        
+        // Try to get GPU info if available
+        if (this.renderer.adapter) {
+            this.renderer.adapter.requestAdapterInfo().then(info => {
+                const gpuInfoString = info.description || info.vendor || 'GPU';
+                this.renderContext.setGpuInfo(gpuInfoString);
+            });
+        }
     }
     
     /**
@@ -49,6 +77,7 @@ export class App {
     private handleRenderModeToggle = (mode: 'wave' | 'fdtd' | 'voxelspace'): void => {
         this.renderer.setRenderMode(mode);
         this.settingsManager.renderMode = mode;
+        this.renderContext.setRenderMode(mode);
     }
     
     /**
@@ -77,6 +106,10 @@ export class App {
         const now = performance.now();
         const deltaTime = (now - this.lastTime) * 0.001; // Convert to seconds
         this.lastTime = now;
+        this.frameCount++;
+        
+        // Update render context with frame data
+        this.renderContext.update(deltaTime);
         
         // Update simulation with delta time
         this.renderer.render(deltaTime);

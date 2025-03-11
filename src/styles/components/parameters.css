@@ -107,7 +107,7 @@ input[type="range"],
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-    transition: max-height 0.1s ease, opacity 0.1s ease, margin-bottom 0.1s ease;
+    transition: max-height 1.5s ease, opacity 1.5s ease, margin-bottom 1.5s ease;
 }
 
 /* Show description when parameter name is hovered */

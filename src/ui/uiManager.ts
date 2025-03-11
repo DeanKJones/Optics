@@ -1,5 +1,8 @@
 import { EventSystem } from "../events/eventSystem";
+import { RenderContext } from "../render/renderContext";
+
 import { SettingsManager } from "../worldSettings/settingsManager";
+import { RenderContextUI } from "../worldSettings/ui/renderContextUI";
 import { OpticsSettingsUI } from "../worldSettings/ui/opticsSettingsUI";
 import { VoxelSpaceSettingsUI } from "../worldSettings/ui/voxelSpaceSettingsUI";
 
@@ -22,16 +25,24 @@ export class UIManager {
     
     // Current active mode
     private currentMode: 'wave' | 'fdtd' | 'voxelspace' = 'wave';
+    
+    // Render context UI
+    private renderContext: RenderContext;
+    private renderContextUI: RenderContextUI;
 
     constructor(
         settingsCanvas: HTMLCanvasElement | undefined,
         onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace') => void,
-        onResetSimulation: () => void
+        onResetSimulation: () => void,
+        renderContext: RenderContext
     ) {
         // Initialize core systems
         this.settingsManager = SettingsManager.getInstance();
         this.eventSystem = EventSystem.getInstance();
         this.settingsCanvas = settingsCanvas;
+        
+        // Store render context
+        this.renderContext = renderContext;
         
         // Create UI components for different settings types
         this.opticsUI = new OpticsSettingsUI(this.settingsManager.optics);
@@ -40,6 +51,9 @@ export class UIManager {
         // Setup shared UI components
         this.controlPanel = this.createControlPanel(onRenderModeToggle, onResetSimulation);
         this.keyInstructions = this.createKeyInstructions();
+        
+        // Initialize render context UI
+        this.renderContextUI = new RenderContextUI(this.renderContext);
         
         // Initialize UI
         this.initializeUI();
@@ -105,11 +119,13 @@ export class UIManager {
         // Create the mode buttons
         createModeButton('Wave', 'wave', '1', true);
         createModeButton('FDTD', 'fdtd', '2');
-
+    
         // Reset simulation button
         const resetButton = document.createElement('a');
         resetButton.href = '#';
         resetButton.innerText = 'Reset Sim (R)';
+        resetButton.id = 'reset-sim-button';
+        resetButton.style.display = 'none'; // Initially hidden
         resetButton.addEventListener('click', (e) => {
             e.preventDefault();
             resetButton.classList.add('active');
@@ -130,7 +146,9 @@ export class UIManager {
                     onRenderModeToggle('fdtd');
                     break;
                 case 'KeyR': 
-                    onResetSimulation();
+                    if (this.currentMode === 'fdtd') { // Only reset if in FDTD mode
+                        onResetSimulation();
+                    }
                     break;
             }
         });
@@ -161,6 +179,9 @@ export class UIManager {
     public setMode(mode: 'wave' | 'fdtd' | 'voxelspace'): void {
         this.currentMode = mode;
         
+        // Update render context
+        this.renderContext.setRenderMode(mode);
+        
         // Update button states
         const buttons = this.controlPanel.querySelectorAll('a');
         buttons.forEach((button, i) => {
@@ -172,6 +193,12 @@ export class UIManager {
                 button.classList.remove('active');
             }
         });
+        
+        // Show/hide reset button based on mode
+        const resetButton = document.getElementById('reset-sim-button');
+        if (resetButton) {
+            resetButton.style.display = mode === 'fdtd' ? 'inline-block' : 'none';
+        }
         
         // Show/hide key instructions
         if (mode === 'voxelspace') {
@@ -207,5 +234,8 @@ export class UIManager {
         } else {
             this.opticsUI.updateControls();
         }
+        
+        // Update render context UI
+        this.renderContextUI.update();
     }
 }

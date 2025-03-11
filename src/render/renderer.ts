@@ -1,6 +1,7 @@
 import { PipelineManager } from "./pipelineDescriptors/pipelineManager";
 import { BufferManager } from "./buffers/bufferManager";
 import { SettingsManager } from "../worldSettings/settingsManager";
+import { RenderContext } from "./renderContext";
 
 export class Renderer {
     canvas: HTMLCanvasElement;
@@ -17,7 +18,7 @@ export class Renderer {
     initialized: boolean = false;
     texturesLoaded: boolean = false;
     
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, private renderContext?: RenderContext) {
         this.canvas = canvas;
         this.settingsManager = SettingsManager.getInstance();
     }
@@ -128,14 +129,15 @@ export class Renderer {
     }
     
     renderWaveOptics() {
+        this.renderContext?.setRenderPass('Wave Optics');
         const commandEncoder = this.device.createCommandEncoder();
         
         const ray_trace_pass = commandEncoder.beginComputePass();
         ray_trace_pass.setPipeline(this.pipelineManager.computePipeline.computePipeline);
         ray_trace_pass.setBindGroup(0, this.pipelineManager.computePipeline.computeBindGroup);
         ray_trace_pass.dispatchWorkgroups(
-            this.canvas.width * 8,
-            this.canvas.height * 8, 1
+            this.canvas.width * 4,
+            this.canvas.height * 4, 1
         );
         ray_trace_pass.end();
         
@@ -143,6 +145,7 @@ export class Renderer {
     }
     
     renderFdtdSimulation() {
+        this.renderContext?.setRenderPass('FDTD Simulation');
         const commandEncoder = this.device.createCommandEncoder();
         
         // FDTD computation involves multiple passes
@@ -152,8 +155,8 @@ export class Renderer {
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineH);
         fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width * 4 / 8),
-            Math.ceil(this.canvas.height * 4 / 8), 
+            Math.ceil(this.canvas.width * 2 / 8),
+            Math.ceil(this.canvas.height * 2 / 8), 
             1
         );
         
@@ -161,8 +164,8 @@ export class Renderer {
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineE);
         fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width * 4 / 8),
-            Math.ceil(this.canvas.height * 4 / 8), 
+            Math.ceil(this.canvas.width * 2 / 8),
+            Math.ceil(this.canvas.height * 2 / 8), 
             1
         );
         
@@ -170,8 +173,8 @@ export class Renderer {
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdVisualizationPipeline);
         fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width * 4 / 8),
-            Math.ceil(this.canvas.height * 4 / 8), 
+            Math.ceil(this.canvas.width * 2 / 8),
+            Math.ceil(this.canvas.height * 2 / 8), 
             1
         );
         
@@ -197,6 +200,7 @@ export class Renderer {
     }
     
     renderVoxelSpace() {
+        this.renderContext?.setRenderPass('VoxelSpace');
         const commandEncoder = this.device.createCommandEncoder();
         
         // Execute VoxelSpace compute shader
