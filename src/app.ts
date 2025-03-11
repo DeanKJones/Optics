@@ -1,28 +1,37 @@
 import { Renderer } from "./render/renderer";
-import { UniformSettings } from "./render/layouts/uniformBufferSettings";
 import { UIManager } from "./ui/uiManager";
+import { SettingsManager } from "./settings/settingsManager";
+import { EventSystem } from "./events/eventSystem";
 
 export class App {
     private canvases: Map<string, HTMLCanvasElement>;
-    private renderer: Renderer;
-    private settings: UniformSettings = new UniformSettings();
     private uiManager: UIManager;
+    public ui: UIManager;
+    private renderer: Renderer;
+    private settingsManager: SettingsManager;
     private initialized: boolean = false;
     private lastTime: number = performance.now();
 
     constructor(canvases: { [key: string]: HTMLCanvasElement }) {
         this.canvases = new Map(Object.entries(canvases));
+        
+        // Initialize event system first (needed for settings manager and UI)
+        EventSystem.getInstance();
+        
+        // Initialize settings manager
+        this.settingsManager = SettingsManager.getInstance();
 
         // Initialize renderer
         this.renderer = new Renderer(this.canvases.get("viewportMain")!);
         
         // Initialize UI Manager with callbacks
         this.uiManager = new UIManager(
-            this.settings,
             this.canvases.get("settingsMain"),
-            this.handleFdtdToggle,
+            this.handleRenderModeToggle,
             this.handleResetSimulation
         );
+        this.ui = this.uiManager;
+        (window as any).app = this;
         
         // Start renderer initialization
         this.renderer.Initialize().then(() => {
@@ -35,19 +44,21 @@ export class App {
     }
     
     /**
-     * Handle FDTD simulation toggle
+     * Handle render mode toggle
      */
-    private handleFdtdToggle = (isEnabled: boolean): void => {
-        this.renderer.useFdtdSimulation = isEnabled;
+    private handleRenderModeToggle = (mode: 'wave' | 'fdtd' | 'voxelspace'): void => {
+        this.renderer.setRenderMode(mode);
+        this.settingsManager.renderMode = mode;
     }
     
     /**
      * Handle simulation reset
      */
     private handleResetSimulation = (): void => {
-        if (this.renderer.useFdtdSimulation) {
+        this.settingsManager.resetSimulation();
+        
+        if (this.renderer.getRenderMode() === 'fdtd') {
             this.renderer.resetFdtdSimulation();
-            this.settings.deltaTime = 0.0;
         }
     }
 
@@ -62,19 +73,16 @@ export class App {
             return;
         }
 
-        // Update time for our simulation
+        // Calculate delta time
         const now = performance.now();
-        const deltaTime = now - this.lastTime;
+        const deltaTime = (now - this.lastTime) * 0.001; // Convert to seconds
         this.lastTime = now;
         
-        // Update simulation time
-        this.settings.deltaTime += deltaTime * 0.001; // Convert to seconds
+        // Update simulation with delta time
+        this.renderer.render(deltaTime);
         
-        // Update the simulation
-        this.renderer.render(this.settings);
-        
-        // Update settings UI
-        this.uiManager.renderSettingsUI();
+        // Update UI
+        this.uiManager.updateUI();
             
         requestAnimationFrame(this.run);
     }
