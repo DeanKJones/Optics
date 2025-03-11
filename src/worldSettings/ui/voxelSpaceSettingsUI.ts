@@ -1,4 +1,4 @@
-import { VoxelSpaceSettings } from "../render/layouts/voxelSpaceUniformSettings";
+import { VoxelSpaceSettings } from "../../render/uniformDataLayouts/voxelSpaceUniformSettings";
 import { BaseSettingsUI } from "./baseSettingsUI";
 
 export class VoxelSpaceSettingsUI extends BaseSettingsUI<VoxelSpaceSettings> {

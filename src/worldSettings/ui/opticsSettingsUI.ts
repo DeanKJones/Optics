@@ -1,4 +1,4 @@
-import { OpticsUniformSettings } from "../render/layouts/opticsUniformSettings";
+import { OpticsUniformSettings } from "../../render/uniformDataLayouts/opticsUniformSettings";
 import { BaseSettingsUI } from "./baseSettingsUI";
 
 export class OpticsSettingsUI extends BaseSettingsUI<OpticsUniformSettings> {
