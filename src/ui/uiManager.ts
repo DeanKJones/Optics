@@ -203,6 +203,8 @@ export class UIManager {
         // Show/hide key instructions
         if (mode === 'voxelspace') {
             this.keyInstructions.innerHTML = 'VoxelSpace Controls: W/S - Move, A/D - Turn, Q/E - Height';
+            this.keyInstructions.style.top = 'auto';
+            this.keyInstructions.style.bottom = '65px';
             this.keyInstructions.style.display = 'block';
         } else {
             this.keyInstructions.style.display = 'none';
