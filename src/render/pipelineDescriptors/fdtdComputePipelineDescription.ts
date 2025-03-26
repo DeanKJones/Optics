@@ -1,9 +1,9 @@
 import { BufferManager } from "../buffers/bufferManager";
 
-import clearTexturesKernel from "../../gpu/shaders/FDTD/clearTexturesKernel.wgsl";
-import fdtdEField from "../../gpu/shaders/FDTD/fdtdEField.wgsl";
-import fdtdHField from "../../gpu/shaders/FDTD/fdtdHField.wgsl";
-import fdtdVisualize from "../../gpu/shaders/FDTD/fdtdVisualize.wgsl";
+import clearTexturesKernel from "../../shaders/FDTD/clearTexturesKernel.wgsl";
+import fdtdEField from "../../shaders/FDTD/fdtdEField.wgsl";
+import fdtdHField from "../../shaders/FDTD/fdtdHField.wgsl";
+import fdtdVisualize from "../../shaders/FDTD/fdtdVisualize.wgsl";
 
 export class fdtdComputePipelineDescriptor {
 

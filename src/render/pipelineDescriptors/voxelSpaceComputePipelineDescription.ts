@@ -1,6 +1,6 @@
 import { BufferManager } from "../buffers/bufferManager";
 import { VoxelSpaceUniformBufferDescription } from "../buffers/uniformBuffers/voxelSpaceUniformBufferDescription";
-import voxelSpaceCompute from "../../gpu/shaders/voxelSpace/voxelSpaceCompute.wgsl";
+import voxelSpaceCompute from "../../shaders/voxelSpace/voxelSpaceCompute.wgsl";
 
 export class VoxelSpacePipelineDescription {
     device: GPUDevice;
