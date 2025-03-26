@@ -1,7 +1,10 @@
 import { PipelineManager } from "./pipelineDescriptors/pipelineManager";
 import { BufferManager } from "./buffers/bufferManager";
 import { SettingsManager } from "../worldSettings/settingsManager";
+
+// Remdering
 import { RenderContext } from "./renderContext";
+import { VoxelWorldRenderer } from "./voxelWorldRenderer";
 
 export class Renderer {
     canvas: HTMLCanvasElement;
@@ -17,6 +20,8 @@ export class Renderer {
 
     initialized: boolean = false;
     texturesLoaded: boolean = false;
+
+    voxelWorldRenderer!: VoxelWorldRenderer;
     
     constructor(canvas: HTMLCanvasElement, private renderContext?: RenderContext) {
         this.canvas = canvas;
@@ -30,6 +35,15 @@ export class Renderer {
         
         // Load textures for VoxelSpace rendering
         await this.loadVoxelSpaceTextures();
+
+        this.voxelWorldRenderer = new VoxelWorldRenderer(
+            this.device,
+            this.context,
+            this.canvas,
+            this.bufferManager.voxelWorldBuffers,
+            this.pipelineManager.voxelWorldPipeline,
+            this.renderContext || new RenderContext()
+        );
         
         this.initialized = true;
     }
@@ -121,11 +135,19 @@ export class Renderer {
                     this.renderVoxelSpace();
                 }
                 break;
+            case 'voxelworld':
+                this.renderVoxelWorld(deltaTime);
+                break;
             case 'wave':
             default:
                 this.renderWaveOptics();
                 break;
         }
+    }
+
+    renderVoxelWorld(deltaTime: number) {
+        this.renderContext?.setRenderPass('Voxel World');
+        this.voxelWorldRenderer.render(deltaTime);
     }
     
     renderWaveOptics() {
@@ -284,12 +306,18 @@ export class Renderer {
         console.log("FDTD simulation reset successfully");
     }
     
+    resetVoxelWorld() {
+        if (this.voxelWorldRenderer) {
+            this.voxelWorldRenderer.reset();
+        }
+    }
+
     // Public methods for changing render mode
-    setRenderMode(mode: 'wave' | 'fdtd' | 'voxelspace'): void {
+    setRenderMode(mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld'): void {
         this.settingsManager.renderMode = mode;
     }
     
-    getRenderMode(): 'wave' | 'fdtd' | 'voxelspace' {
+    getRenderMode(): 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' {
         return this.settingsManager.renderMode;
     }
 }

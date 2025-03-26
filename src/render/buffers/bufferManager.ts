@@ -3,6 +3,7 @@ import { OpticsUniformBufferDescription } from "./uniformBuffers/opticsUniformBu
 import { FDTDBufferDescription } from "./fdtdBufferDescription";
 import { VoxelSpaceBufferDescription } from "./voxelSpaceBufferDescription";
 import { VoxelSpaceUniformBufferDescription } from "./uniformBuffers/voxelSpaceUniformBufferDescription";
+import { VoxelWorldBufferDescription } from "./voxelWorldBufferDescription";
 
 export class BufferManager {
 
@@ -12,6 +13,7 @@ export class BufferManager {
     screenBuffers!: ScreenBufferDescription;
     fdtdBuffers!: FDTDBufferDescription;
     voxelSpaceBuffers!: VoxelSpaceBufferDescription;
+    voxelWorldBuffers!: VoxelWorldBufferDescription;
 
     // Uniform Buffers
     opticsUniformBuffer!: OpticsUniformBufferDescription;
@@ -27,5 +29,6 @@ export class BufferManager {
         // Uniform Buffers
         this.opticsUniformBuffer = new OpticsUniformBufferDescription(this.device, this.canvas);
         this.voxelSpaceUniformBuffer = new VoxelSpaceUniformBufferDescription(this.device);
+        this.voxelWorldBuffers = new VoxelWorldBufferDescription(this.device, this.canvas);
     }
 }

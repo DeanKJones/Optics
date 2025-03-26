@@ -11,7 +11,7 @@ export class RenderContext {
     private frameAccumulator: number = 0;
     
     // Render state information
-    private currentRenderMode: 'wave' | 'fdtd' | 'voxelspace' = 'wave';
+    private currentRenderMode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' = 'wave';
     private currentRenderPass: string = '';
     
     // Additional renderer details
@@ -41,7 +41,7 @@ export class RenderContext {
     /**
      * Set the current render mode
      */
-    public setRenderMode(mode: 'wave' | 'fdtd' | 'voxelspace'): void {
+    public setRenderMode(mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld'): void {
         this.currentRenderMode = mode;
     }
     
@@ -104,7 +104,7 @@ export class RenderContext {
     /**
      * Get current render mode
      */
-    public getRenderMode(): 'wave' | 'fdtd' | 'voxelspace' {
+    public getRenderMode(): 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' {
         return this.currentRenderMode;
     }
     

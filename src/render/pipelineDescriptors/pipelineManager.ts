@@ -3,6 +3,7 @@ import { computePipelineDescriptor } from "./waveOpticsComputePipelineDescriptio
 import { screenPipelineDescriptor } from "./screenPipelineDescription";
 import { fdtdComputePipelineDescriptor } from "./fdtdComputePipelineDescription";
 import { VoxelSpacePipelineDescription } from "./voxelSpaceComputePipelineDescription";
+import { VoxelWorldPipelineDescription } from "./voxelWorldPipelineDescription";
 
 export class PipelineManager {
 
@@ -12,6 +13,7 @@ export class PipelineManager {
     computePipeline!: computePipelineDescriptor;
     screenPipeline!: screenPipelineDescriptor;
     voxelSpacePipeline!: VoxelSpacePipelineDescription;
+    voxelWorldPipeline!: VoxelWorldPipelineDescription;
 
     constructor(device: GPUDevice, bufferManager: BufferManager){
         this.device = device;
@@ -20,5 +22,6 @@ export class PipelineManager {
         this.computePipeline = new computePipelineDescriptor(this.device, bufferManager);
         this.screenPipeline = new screenPipelineDescriptor(this.device, bufferManager);
         this.voxelSpacePipeline = new VoxelSpacePipelineDescription(this.device, bufferManager);
+        this.voxelWorldPipeline = new VoxelWorldPipelineDescription(this.device, bufferManager);
     }
 }

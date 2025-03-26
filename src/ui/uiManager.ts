@@ -23,7 +23,7 @@ export class UIManager {
     private settingsCanvas: HTMLCanvasElement | undefined;
     
     // Current active mode
-    private currentMode: 'wave' | 'fdtd' | 'voxelspace' = 'wave';
+    private currentMode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' = 'wave';
     
     // Render context UI
     private renderContext: RenderContext;
@@ -31,7 +31,7 @@ export class UIManager {
 
     constructor(
         settingsCanvas: HTMLCanvasElement | undefined,
-        onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace') => void,
+        onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld') => void,
         onResetSimulation: () => void,
         renderContext: RenderContext
     ) {
@@ -82,7 +82,7 @@ export class UIManager {
      * Create the main control panel with mode selection buttons
      */
     private createControlPanel(
-        onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace') => void,
+        onRenderModeToggle: (mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld') => void,
         onResetSimulation: () => void
     ): HTMLDivElement {
         const controlPanel = document.createElement('div');
@@ -95,7 +95,7 @@ export class UIManager {
         // Create mode buttons with common structure
         const createModeButton = (
             label: string, 
-            mode: 'wave' | 'fdtd' | 'voxelspace',
+            mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld',
             shortcut: string,
             isActive: boolean = false
         ) => {
@@ -117,6 +117,8 @@ export class UIManager {
         // Create the mode buttons
         createModeButton('Wave', 'wave', '1', true);
         createModeButton('FDTD', 'fdtd', '2');
+        createModeButton('VoxelSpace', 'voxelspace', '3');
+        createModeButton('VoxelWorld', 'voxelworld', '4');
     
         // Reset simulation button
         const resetButton = document.createElement('a');
@@ -143,6 +145,14 @@ export class UIManager {
                     this.setMode('fdtd');
                     onRenderModeToggle('fdtd');
                     break;
+                case 'Digit3': 
+                    this.setMode('voxelspace');
+                    onRenderModeToggle('voxelspace');
+                    break;
+                case 'Digit4': 
+                    this.setMode('voxelworld');
+                    onRenderModeToggle('voxelworld');
+                    break;
                 case 'KeyR': 
                     if (this.currentMode === 'fdtd') { // Only reset if in FDTD mode
                         onResetSimulation();
@@ -158,7 +168,7 @@ export class UIManager {
     /**
      * Set the active mode and update UI accordingly
      */
-    public setMode(mode: 'wave' | 'fdtd' | 'voxelspace'): void {
+    public setMode(mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld'): void {
         this.currentMode = mode;
 
         // Update render context
@@ -188,31 +198,42 @@ export class UIManager {
         //const parametersContent = parametersBox?.querySelector('.parameters-content');
 
         if (parametersBox && parametersHeader) {
-        if (mode === 'voxelspace') {
-            // Hide the parameter sliders for voxelSpace mode
-            parametersHeader.innerHTML = `
-                <h2>VoxelSpace Controls</h2>
-                <p class="description">Use keyboard to navigate: W/S - Move, A/D - Turn, Q/E - Height</p>
-            `;
+            if (mode === 'voxelworld') {
+                parametersHeader.innerHTML = `
+                    Voxel World Controls
+                    WASD to move, Mouse to look, Space/Shift to go up/down
+                `;
+                
+                // Hide the parameter groups
+                const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
+                parameterGroups.forEach(group => {
+                    (group as HTMLElement).style.display = 'none';
+                });
+            } else if (mode === 'voxelspace') {
+                // Hide the parameter sliders for voxelSpace mode
+                parametersHeader.innerHTML = `
+                    <h2>VoxelSpace Controls</h2>
+                    <p class="description">Use keyboard to navigate: W/S - Move, A/D - Turn, Q/E - Height</p>
+                `;
             
-            // Hide the parameter groups
-            const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
-            parameterGroups.forEach(group => {
-                (group as HTMLElement).style.display = 'none';
-            });
-        } else {
-            // Restore wave/FDTD parameters UI
-            parametersHeader.innerHTML = `
-                <h2>${mode === 'fdtd' ? 'FDTD' : 'Wave'} Simulation Parameters</h2>
-                <p class="description">Adjust the parameters of the ${mode === 'fdtd' ? 'FDTD simulation' : 'light wave and diffraction grating'}</p>
-            `;
-            
-            // Show the parameter groups
-            const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
-            parameterGroups.forEach(group => {
-                (group as HTMLElement).style.display = 'block';
-            });
-        }
+                // Hide the parameter groups
+                const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
+                parameterGroups.forEach(group => {
+                    (group as HTMLElement).style.display = 'none';
+                });
+            } else {
+                // Restore wave/FDTD parameters UI
+                parametersHeader.innerHTML = `
+                    <h2>${mode === 'fdtd' ? 'FDTD' : 'Wave'} Simulation Parameters</h2>
+                    <p class="description">Adjust the parameters of the ${mode === 'fdtd' ? 'FDTD simulation' : 'light wave and diffraction grating'}</p>
+                `;
+                
+                // Show the parameter groups
+                const parameterGroups = parametersBox.querySelectorAll('.parameter-group');
+                parameterGroups.forEach(group => {
+                    (group as HTMLElement).style.display = 'block';
+                });
+            }
         }
 
         // Update UI components

@@ -74,10 +74,14 @@ export class App {
     /**
      * Handle render mode toggle
      */
-    private handleRenderModeToggle = (mode: 'wave' | 'fdtd' | 'voxelspace'): void => {
+    private handleRenderModeToggle = (mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld'): void => {
         this.renderer.setRenderMode(mode);
         this.settingsManager.renderMode = mode;
         this.renderContext.setRenderMode(mode);
+
+        if (mode === 'voxelworld') {
+            // Any special initialization for voxel world mode
+        }
     }
     
     /**
@@ -88,6 +92,9 @@ export class App {
         
         if (this.renderer.getRenderMode() === 'fdtd') {
             this.renderer.resetFdtdSimulation();
+        } else if (this.renderer.getRenderMode() === 'voxelworld') {
+            // Reset the voxel world simulation
+            this.renderer.resetVoxelWorld();
         }
     }
 

@@ -10,7 +10,7 @@ export class SettingsManager {
     private voxelSpaceSettings: VoxelSpaceSettings;
     
     // Rendering mode
-    private _renderMode: 'wave' | 'fdtd' | 'voxelspace' = 'wave';
+    private _renderMode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' = 'wave';
     
     // Event system reference
     private eventSystem: EventSystem;
@@ -62,11 +62,11 @@ export class SettingsManager {
     }
     
     // Render mode management
-    public get renderMode(): 'wave' | 'fdtd' | 'voxelspace' {
+    public get renderMode(): 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' {
         return this._renderMode;
     }
     
-    public set renderMode(mode: 'wave' | 'fdtd' | 'voxelspace') {
+    public set renderMode(mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld') {
         this._renderMode = mode;
     }
     
