@@ -215,6 +215,7 @@
             const panels = Array.from(document.querySelectorAll('.parameter-panel'));
             const scene = document.querySelector('.parameter-scene');
             const collapseToggle = document.getElementById('parameter-collapse-toggle');
+            const header = document.querySelector('.parameter-scene-header');
 
             function activatePanel(panelName) {
                 tabs.forEach((tab) => {
@@ -244,7 +245,18 @@
                 });
             });
 
-            collapseToggle?.addEventListener('click', () => {
+            collapseToggle?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                setCollapsed(scene?.classList.contains('collapsed') !== true);
+            });
+
+            header?.addEventListener('click', (event) => {
+                if (event.target instanceof HTMLElement && event.target.closest('.component-selector')) {
+                    return;
+                }
+                if (event.target instanceof HTMLElement && event.target.closest('.component-tab')) {
+                    return;
+                }
                 setCollapsed(scene?.classList.contains('collapsed') !== true);
             });
 

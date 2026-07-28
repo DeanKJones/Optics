@@ -12,6 +12,8 @@
 
 .parameter-scene {
     width: min(320px, calc(100vw - 24px));
+    max-width: min(320px, calc(100vw - 24px));
+    min-width: 48px;
     max-height: calc(100vh - 100px);
     background: rgba(24, 24, 24, 0.92);
     border-radius: 12px 0 0 12px;
@@ -100,12 +102,21 @@
 }
 
 .parameter-scene.collapsed .parameter-window,
-.parameter-scene.collapsed .component-selector {
+.parameter-scene.collapsed .component-selector,
+.parameter-scene.collapsed .parameter-scene-title {
     display: none;
 }
 
 .parameter-scene.collapsed {
+    width: 48px;
+    max-width: 48px;
     max-height: none;
+}
+
+.parameter-scene.collapsed .parameter-scene-header {
+    justify-content: center;
+    padding: 10px 8px;
+    border-bottom: 0;
 }
 
 .parameter-panel {
