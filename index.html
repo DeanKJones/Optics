@@ -174,15 +174,20 @@
                                         </label>
                                     </div>
 
+                                    <div class="parameter-group">
+                                        <label for="emitter-amplitude-slider">
+                                            <span class="parameter-name">Amplitude</span>
+                                            <span class="parameter-description">Controls the wave source amplitude</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="emitter-amplitude-slider" min="0.00" max="10.00" value="4.00" step="0.10">
+                                                <span id="emitter-amplitude-value" class="value-display">4.0</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
                                     <div class="parameter-group emitter-panel">
                                         <span class="parameter-name">Wave Properties</span>
                                         <span class="parameter-description">Wave-specific settings for the source and visual feedback</span>
-
-                                        <div class="slider-container">
-                                            <label for="emitter-amplitude-slider">Amplitude</label>
-                                            <input type="range" id="emitter-amplitude-slider" min="0.00" max="10.00" value="4.00" step="0.10">
-                                            <span id="emitter-amplitude-value" class="value-display">4.0</span>
-                                        </div>
 
                                         <div class="slider-container color-picker-row">
                                             <label for="positive-color-input">Positive Field Color</label>
