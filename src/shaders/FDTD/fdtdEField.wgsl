@@ -31,7 +31,7 @@ fn update_e_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
     let magneticYLeft = textureLoad(magneticFieldY, vec2<i32>(x - 1, y));
     
     // Stability factor for simulation
-    let stabilityFactor = 0.5;
+    let stabilityFactor = simulation_parameters.stabilityFactor;
     
     // Scale UV to the same simulation space used by visualization and grating geometry helpers
     normalizedUV = normalizedUV * simulation_parameters.viewportScale;

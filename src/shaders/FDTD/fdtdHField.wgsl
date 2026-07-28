@@ -23,8 +23,8 @@ fn update_h_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
     let electricFieldAbove = textureLoad(electricField, vec2<i32>(x, y + 1));
     
     // Stability factor (prevents simulation from exploding)
-    // For 2D simulations, this should be <= 1/sqrt(2) for stability
-    let stabilityFactor = 0.5;
+    // For 2D simulations, this should be <= 1/sqrt(2) for stability.
+    let stabilityFactor = simulation_parameters.stabilityFactor;
     
     // Update magnetic field values based on curl of electric field
     // These equations come from Faraday's Law: ∂B/∂t = -∇×E

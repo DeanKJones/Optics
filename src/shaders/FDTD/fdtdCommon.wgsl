@@ -22,6 +22,7 @@ struct SimulationParameters {
     emitterAmplitude: f32,         // Source amplitude
     emitterFrequencyScale: f32,    // Multiplier applied to source frequency
     slitPlaneAbsorption: f32,      // 0..1 absorption in slit/grating material
+    stabilityFactor: f32,          // Courant-like factor controlling propagation per step
     positiveColorR: f32,
     positiveColorG: f32,
     positiveColorB: f32,

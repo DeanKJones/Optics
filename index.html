@@ -45,7 +45,7 @@
                                             <span class="parameter-name">Screen Size</span>
                                             <span class="parameter-description">Controls the visible area of the simulation</span>
                                             <div class="slider-container">
-                                                <input type="range" id="screen-size-mult-slider" min="1.0" max="5.0" value="1.0"
+                                                <input type="range" id="screen-size-mult-slider" min="1.0" max="6.0" value="1.0"
                                                     step="0.1">
                                                 <span id="screen-size-mult-value" class="value-display">1.0</span>
                                             </div>
@@ -57,7 +57,7 @@
                                             <span class="parameter-name">Grate Distance</span>
                                             <span class="parameter-description">Distance of the grating from the emitter band, following the selected propagation direction</span>
                                             <div class="slider-container">
-                                                <input type="range" id="slit-position-slider" min="0.005" max="0.20" value="0.02"
+                                                <input type="range" id="slit-position-slider" min="0.005" max="0.30" value="0.02"
                                                     step="0.001">
                                                 <span id="slit-position-value" class="value-display">2.0%</span>
                                             </div>
@@ -70,9 +70,33 @@
                                             <span class="parameter-name">Slit Plane Absorption</span>
                                             <span class="parameter-description">Absorption in the non-slit parts of the plane (90-100%)</span>
                                             <div class="slider-container">
-                                                <input type="range" id="slit-plane-absorption-slider" min="0.90" max="1.00" value="1.00"
+                                                <input type="range" id="slit-plane-absorption-slider" min="0.00" max="1.00" value="1.00"
                                                     step="0.01">
                                                 <span id="slit-plane-absorption-value" class="value-display">100%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="parameter-group">
+                                        <label for="simulation-substeps-slider">
+                                            <span class="parameter-name">Simulation Substeps</span>
+                                            <span class="parameter-description">Number of FDTD update steps each rendered frame</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="simulation-substeps-slider" min="1" max="8" value="2"
+                                                    step="1">
+                                                <span id="simulation-substeps-value" class="value-display">2 steps/frame</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="parameter-group">
+                                        <label for="stability-factor-slider">
+                                            <span class="parameter-name">Stability Factor</span>
+                                            <span class="parameter-description">Courant factor for wave propagation speed (keep 0.70 or lower)</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="stability-factor-slider" min="0.10" max="0.70" value="0.60"
+                                                    step="0.01">
+                                                <span id="stability-factor-value" class="value-display">0.60</span>
                                             </div>
                                         </label>
                                     </div>
@@ -107,7 +131,7 @@
                                             <span class="parameter-description">Controls the width of each slit in the diffraction
                                                 grating</span>
                                             <div class="slider-container">
-                                                <input type="range" id="slit-width-slider" min="0.001" max="0.050" value="0.005"
+                                                <input type="range" id="slit-width-slider" min="0.001" max="0.100" value="0.005"
                                                     step="0.001">
                                                 <span id="slit-width-value" class="value-display">0.005 mm</span>
                                             </div>
@@ -120,7 +144,7 @@
                                             <span class="parameter-description">Controls the total width of the diffraction
                                                 grating</span>
                                             <div class="slider-container">
-                                                <input type="range" id="grate-width-slider" min="0.05" max="1.5" value="0.40"
+                                                <input type="range" id="grate-width-slider" min="0.05" max="3.0" value="0.40"
                                                     step="0.01">
                                                 <span id="grate-width-value" class="value-display">0.30 mm</span>
                                             </div>
@@ -133,7 +157,7 @@
                                             <span class="parameter-description">Controls how many slits are in the diffraction
                                                 grating</span>
                                             <div class="slider-container">
-                                                <input type="range" id="number-of-slits-slider" min="1.0" max="25.0" value="10.0"
+                                                <input type="range" id="number-of-slits-slider" min="1.0" max="15.0" value="10.0"
                                                     step="1.0">
                                                 <span id="number-of-slits-value" class="value-display">10</span>
                                             </div>
@@ -145,7 +169,7 @@
                                             <span class="parameter-name">Slit Thickness</span>
                                             <span class="parameter-description">Thickness of the grating as a fraction of screen height</span>
                                             <div class="slider-container">
-                                                <input type="range" id="slit-thickness-slider" min="0.010" max="0.020" value="0.015"
+                                                <input type="range" id="slit-thickness-slider" min="0.010" max="0.030" value="0.015"
                                                     step="0.001">
                                                 <span id="slit-thickness-value" class="value-display">1.50%</span>
                                             </div>
@@ -168,7 +192,7 @@
                                             <span class="parameter-name">Wavelength</span>
                                             <span class="parameter-description">Controls the wave source wavelength and its perceived color</span>
                                             <div class="slider-container">
-                                                <input type="range" id="wavelength-slider" min="100" max="1000" value="500" step="10">
+                                                <input type="range" id="wavelength-slider" min="10" max="1200" value="500" step="10">
                                                 <span id="wavelength-value" class="value-display">500 nm</span>
                                             </div>
                                         </label>
@@ -179,7 +203,7 @@
                                             <span class="parameter-name">Amplitude</span>
                                             <span class="parameter-description">Controls the wave source amplitude</span>
                                             <div class="slider-container">
-                                                <input type="range" id="emitter-amplitude-slider" min="0.00" max="10.00" value="4.00" step="0.10">
+                                                <input type="range" id="emitter-amplitude-slider" min="0.50" max="10.00" value="4.00" step="0.10">
                                                 <span id="emitter-amplitude-value" class="value-display">4.0</span>
                                             </div>
                                         </label>

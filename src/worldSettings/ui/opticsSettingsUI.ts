@@ -21,6 +21,8 @@ export class OpticsSettingsUI extends BaseSettingsUI<OpticsUniformSettings> {
         this.setupSlitPositionSlider();
         this.setupSlitThicknessSlider();
         this.setupSlitPlaneAbsorptionSlider();
+        this.setupSimulationSubstepsSlider();
+        this.setupStabilityFactorSlider();
         this.setupPropagationDirectionSelect();
         this.setupEmitterAmplitudeSlider();
         this.setupEmitterColorInputs();
@@ -36,6 +38,8 @@ export class OpticsSettingsUI extends BaseSettingsUI<OpticsUniformSettings> {
         this.updateValueDisplay("slit-position", `${(this.settings.getSlitPositionY() * 100).toFixed(1)}%`);
         this.updateValueDisplay("slit-thickness", `${(this.settings.getSlitThickness() * 100).toFixed(2)}%`);
         this.updateValueDisplay("slit-plane-absorption", `${(this.settings.slitPlaneAbsorption * 100).toFixed(0)}%`);
+        this.updateValueDisplay("simulation-substeps", `${Math.round(this.settings.simulationSubsteps)} steps/frame`);
+        this.updateValueDisplay("stability-factor", this.settings.stabilityFactor.toFixed(2));
         this.updateValueDisplay("emitter-amplitude", `${this.settings.emitterAmplitude.toFixed(1)}`);
         
         this.setSliderValue("wavelength", this.settings.getWavelengthNm());
@@ -46,6 +50,8 @@ export class OpticsSettingsUI extends BaseSettingsUI<OpticsUniformSettings> {
         this.setSliderValue("slit-position", this.settings.getSlitPositionY());
         this.setSliderValue("slit-thickness", this.settings.getSlitThickness());
         this.setSliderValue("slit-plane-absorption", this.settings.slitPlaneAbsorption);
+        this.setSliderValue("simulation-substeps", this.settings.simulationSubsteps);
+        this.setSliderValue("stability-factor", this.settings.stabilityFactor);
         this.setSliderValue("emitter-amplitude", this.settings.emitterAmplitude);
 
         this.setSelectValue("propagation-direction", this.settings.propagationDirection.toString());
@@ -183,6 +189,38 @@ export class OpticsSettingsUI extends BaseSettingsUI<OpticsUniformSettings> {
 
             this.sliders.set("slit-plane-absorption", slider);
             this.valueDisplays.set("slit-plane-absorption", valueDisplay);
+        }
+    }
+
+    private setupSimulationSubstepsSlider(): void {
+        const slider = this.getControlElement<HTMLInputElement>("simulation-substeps-slider");
+        const valueDisplay = this.getControlElement<HTMLSpanElement>("simulation-substeps-value");
+
+        if (slider) {
+            slider.addEventListener("input", () => {
+                const value = parseFloat(slider.value);
+                this.settings.setSimulationSubsteps(value);
+                this.updateValueDisplay("simulation-substeps", `${Math.round(this.settings.simulationSubsteps)} steps/frame`);
+            });
+
+            this.sliders.set("simulation-substeps", slider);
+            this.valueDisplays.set("simulation-substeps", valueDisplay);
+        }
+    }
+
+    private setupStabilityFactorSlider(): void {
+        const slider = this.getControlElement<HTMLInputElement>("stability-factor-slider");
+        const valueDisplay = this.getControlElement<HTMLSpanElement>("stability-factor-value");
+
+        if (slider) {
+            slider.addEventListener("input", () => {
+                const value = parseFloat(slider.value);
+                this.settings.setStabilityFactor(value);
+                this.updateValueDisplay("stability-factor", this.settings.stabilityFactor.toFixed(2));
+            });
+
+            this.sliders.set("stability-factor", slider);
+            this.valueDisplays.set("stability-factor", valueDisplay);
         }
     }
 

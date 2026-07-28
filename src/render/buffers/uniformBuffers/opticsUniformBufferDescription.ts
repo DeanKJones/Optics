@@ -13,7 +13,7 @@ export class OpticsUniformBufferDescription {
         this.canvas = canvas;
         
         this.gpuBuffer = device.createBuffer({
-                        size: 88, // 22 floats x 4 bytes
+                                                size: 80, // 20 floats x 4 bytes
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           });
         
@@ -40,6 +40,7 @@ export class OpticsUniformBufferDescription {
                 uniformBufferParams.emitterAmplitude,
                 uniformBufferParams.emitterFrequencyScale,
                 uniformBufferParams.slitPlaneAbsorption,
+                uniformBufferParams.stabilityFactor,
                 uniformBufferParams.positiveColorR,
                 uniformBufferParams.positiveColorG,
                 uniformBufferParams.positiveColorB,

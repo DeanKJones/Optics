@@ -114,27 +114,30 @@ export class Renderer {
         
         // FDTD computation involves multiple passes
         const fdtd_compute_pass = commandEncoder.beginComputePass();
+        const simulationSubsteps = Math.max(1, Math.round(this.settingsManager.optics.simulationSubsteps));
         
         const textureWidth = this.bufferManager.fdtdBuffers.ezBuffer.width;
         const textureHeight = this.bufferManager.fdtdBuffers.ezBuffer.height;
 
-        // 1. Update H fields
-        fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineH);
-        fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
-        fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(textureWidth / 8),
-            Math.ceil(textureHeight / 8),
-            1
-        );
-        
-        // 2. Update E fields
-        fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineE);
-        fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
-        fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(textureWidth / 8),
-            Math.ceil(textureHeight / 8),
-            1
-        );
+        for (let step = 0; step < simulationSubsteps; step++) {
+            // 1. Update H fields
+            fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineH);
+            fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
+            fdtd_compute_pass.dispatchWorkgroups(
+                Math.ceil(textureWidth / 8),
+                Math.ceil(textureHeight / 8),
+                1
+            );
+
+            // 2. Update E fields
+            fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineE);
+            fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
+            fdtd_compute_pass.dispatchWorkgroups(
+                Math.ceil(textureWidth / 8),
+                Math.ceil(textureHeight / 8),
+                1
+            );
+        }
         
         // 3. Visualize the fields
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdVisualizationPipeline);

@@ -19,6 +19,8 @@ export class OpticsUniformSettings {
     emitterAmplitude: number = 4.0;
     emitterFrequencyScale: number = 1.0;
     slitPlaneAbsorption: number = 1.0; // 1.0 = 100% absorption
+    simulationSubsteps: number = 2.0;
+    stabilityFactor: number = 0.6;
     positiveColorR: number = 0.0;
     positiveColorG: number = 0.0;
     positiveColorB: number = 1.0;
@@ -40,6 +42,8 @@ export class OpticsUniformSettings {
         this.emitterAmplitude = 2.0;
         this.emitterFrequencyScale = 1.0;
         this.slitPlaneAbsorption = 1.0;
+        this.simulationSubsteps = 2.0;
+        this.stabilityFactor = 0.6;
         
         this.positiveColorR = 1.0;
         this.positiveColorG = 1.0;
@@ -106,6 +110,14 @@ export class OpticsUniformSettings {
         this.slitPlaneAbsorption = Math.max(0.0, Math.min(1.0, absorption));
     }
 
+    setSimulationSubsteps(substeps: number): void {
+        this.simulationSubsteps = Math.max(1.0, Math.min(8.0, Math.round(substeps)));
+    }
+
+    setStabilityFactor(factor: number): void {
+        this.stabilityFactor = Math.max(0.1, Math.min(0.7, factor));
+    }
+
     setPositiveColor(color: { r: number; g: number; b: number }): void {
         this.positiveColorR = color.r;
         this.positiveColorG = color.g;
@@ -148,6 +160,8 @@ export class OpticsUniformSettings {
         this.emitterAmplitude = pSettings.emitterAmplitude;
         this.emitterFrequencyScale = pSettings.emitterFrequencyScale;
         this.slitPlaneAbsorption = pSettings.slitPlaneAbsorption;
+        this.simulationSubsteps = pSettings.simulationSubsteps;
+        this.stabilityFactor = pSettings.stabilityFactor;
         this.positiveColorR = pSettings.positiveColorR;
         this.positiveColorG = pSettings.positiveColorG;
         this.positiveColorB = pSettings.positiveColorB;
@@ -155,7 +169,7 @@ export class OpticsUniformSettings {
         this.negativeColorG = pSettings.negativeColorG;
         this.negativeColorB = pSettings.negativeColorB;
     }
-    
+
     // Updated rendering function
     renderSettingsUI(ctx: CanvasRenderingContext2D) {
         if (!ctx) return;
