@@ -34,25 +34,37 @@ fn visualize(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
         let electricField = electricFieldValues.x;
         var fieldValue = electricField;
         let fieldMagnitude = abs(fieldValue);
+        let positiveColor = vec3<f32>(
+            simulation_parameters.positiveColorR,
+            simulation_parameters.positiveColorG,
+            simulation_parameters.positiveColorB
+        );
+        let negativeColor = vec3<f32>(
+            simulation_parameters.negativeColorR,
+            simulation_parameters.negativeColorG,
+            simulation_parameters.negativeColorB
+        );
         
-        // Positive field = blue, negative field = red
+        // Positive/negative field use configurable visualization colors
         if (fieldMagnitude > 0.01) { 
-            let scaledMagnitude = clamp(fieldValue, -0.7, 0.7);
+            let intensity = clamp(fieldMagnitude / 0.7, 0.0, 1.0);
 
             if (fieldValue > 0.0) {
-                pixelColor = vec4<f32>(0.0, 0.0, scaledMagnitude, 1.0);
+                pixelColor = vec4<f32>(positiveColor * intensity, 1.0);
             } else {
-                pixelColor = vec4<f32>(-scaledMagnitude, 0.0, 0.0, 1.0); 
+                pixelColor = vec4<f32>(negativeColor * intensity, 1.0); 
             }
         }
     }
 
     let debugMode = 0;
     if (debugMode > 0) {
+        let emitterBandEdgeY = simulation_parameters.viewportScale - (2.0 * simulation_parameters.emitterBandHeight * simulation_parameters.viewportScale);
+
         // Show grating in red, slits in blue
         if (isInDiffractionGrating(normalizedUV)) {
             pixelColor = vec4<f32>(0.8, 0.0, 0.0, 1.0);
-        } else if (abs(normalizedUV.y - LIGHT_SOURCE_HEIGHT * simulation_parameters.viewportScale) < 0.02 / simulation_parameters.viewportScale) {
+        } else if (normalizedUV.y >= emitterBandEdgeY) {
             // Get the actual electric field value at this point
             let fieldValue = electricFieldValues.x;
             // Use actual field value to modulate the color intensity

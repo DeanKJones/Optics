@@ -17,10 +17,10 @@ export class screenPipelineDescriptor {
         this.initialize();
     }
 
-    initialize = async () => {
+    initialize = () => {
         this.createScreenBindGroupLayout();
-        await this.createScreenBindGroup();
-        await this.createScreenPipeline();
+        this.createScreenBindGroup();
+        this.createScreenPipeline();
     }
 
     
@@ -44,7 +44,7 @@ export class screenPipelineDescriptor {
     }
 
 
-    createScreenBindGroup = async () => {
+    createScreenBindGroup = () => {
         const bindGroupLayout = this.screenBindGroup_layout;
 
         this.screenBindGroup = this.device.createBindGroup({
@@ -64,7 +64,7 @@ export class screenPipelineDescriptor {
     }
 
 
-    createScreenPipeline = async () => {
+    createScreenPipeline = () => {
         const screenBindGroupLayout = this.screenBindGroup_layout;
         const screen_pipeline_layout = this.device.createPipelineLayout({
             bindGroupLayouts: [screenBindGroupLayout]

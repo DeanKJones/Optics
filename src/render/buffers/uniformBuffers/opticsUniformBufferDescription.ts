@@ -13,7 +13,7 @@ export class OpticsUniformBufferDescription {
         this.canvas = canvas;
         
         this.gpuBuffer = device.createBuffer({
-            size: 24, // 6 floats x 4 bytes (including red/blue frequency ratios)
+                        size: 88, // 22 floats x 4 bytes
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           });
         
@@ -33,6 +33,19 @@ export class OpticsUniformBufferDescription {
                 uniformBufferParams.grateWidth,     // Direct grate width in mm
                 uniformBufferParams.numberOfSlits,
                 uniformBufferParams.screenSize,
+                uniformBufferParams.slitPositionY,
+                uniformBufferParams.slitThickness,
+                uniformBufferParams.propagationDirection,
+                uniformBufferParams.emitterBandHeight,
+                uniformBufferParams.emitterAmplitude,
+                uniformBufferParams.emitterFrequencyScale,
+                uniformBufferParams.slitPlaneAbsorption,
+                uniformBufferParams.positiveColorR,
+                uniformBufferParams.positiveColorG,
+                uniformBufferParams.positiveColorB,
+                uniformBufferParams.negativeColorR,
+                uniformBufferParams.negativeColorG,
+                uniformBufferParams.negativeColorB,
             ]));
     }
 }

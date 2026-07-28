@@ -15,12 +15,23 @@ struct SimulationParameters {
     grateWidth: f32,               // Total width of the diffraction grating in mm
     numberOfSlits: f32,            // Number of slits in the diffraction grating
     viewportScale: f32,            // Scale factor for the simulation viewport
+    slitPositionY: f32,            // Fraction from the selected edge
+    slitThickness: f32,            // Fraction of full screen height
+    propagationDirection: f32,     // 0 top->bottom, 1 bottom->top, 2 left->right, 3 right->left
+    emitterBandHeight: f32,        // Fraction of screen height used as emitter band
+    emitterAmplitude: f32,         // Source amplitude
+    emitterFrequencyScale: f32,    // Multiplier applied to source frequency
+    slitPlaneAbsorption: f32,      // 0..1 absorption in slit/grating material
+    positiveColorR: f32,
+    positiveColorG: f32,
+    positiveColorB: f32,
+    negativeColorR: f32,
+    negativeColorG: f32,
+    negativeColorB: f32,
 }
 
 // Physical constants
 const SPEED_OF_LIGHT: f32 = 1.0;                // Normalized light speed
 const FREE_SPACE_IMPEDANCE: f32 = 377.0;        // Impedance of free space (ohms)
-const DIFFRACTION_GRATING_HEIGHT: f32 = -0.95;  // Y-position of the diffraction grating
-const LIGHT_SOURCE_HEIGHT: f32 = -0.965;        // Y-position of the primary light source
 const ABSORBING_BORDER_WIDTH: f32 = 0.15;       // Width of absorbing boundary (fraction of screen)
 const ABSORPTION_STRENGTH: f32 = 0.99;          // Absorption coefficient (0-1)

@@ -8,9 +8,9 @@ fn update_e_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
     let x = i32(GlobalInvocationID.x);
     let y = i32(GlobalInvocationID.y);
     
-    // Bounds checking
+    // Bounds checking: keep one texel of margin so neighbor loads remain in-bounds.
     let maxDimensions = vec2<i32>(i32(textureDimensions.x), i32(textureDimensions.y));
-    if (x < 0 || x >= maxDimensions.x - 1 || y < 0 || y >= maxDimensions.y - 1) {
+    if (x <= 0 || x >= maxDimensions.x - 2 || y <= 0 || y >= maxDimensions.y - 2) {
         return;
     }
     
@@ -33,6 +33,9 @@ fn update_e_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
     // Stability factor for simulation
     let stabilityFactor = 0.5;
     
+    // Scale UV to the same simulation space used by visualization and grating geometry helpers
+    normalizedUV = normalizedUV * simulation_parameters.viewportScale;
+
     // Check if this point is in the diffraction grating material
     let isInGratingMaterial = isInDiffractionGrating(normalizedUV);
     
@@ -45,29 +48,27 @@ fn update_e_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
         let magneticFieldCurlZ = (magneticYHere.x - magneticYLeft.x) - (magneticXHere.x - magneticXBelow.x);
         electricFieldValue = vec4<f32>(electricFieldValue.x + stabilityFactor * magneticFieldCurlZ, 0.0, 0.0, 0.0);
     } else {
-        // Inside grating material (perfect conductor), electric field is zero
-        electricFieldValue = vec4<f32>(0.0, 0.0, 0.0, 0.0);
+        // Inside slit plane material: absorb rather than reflect
+        let keepFactor = getSlitPlaneKeepFactor();
+        electricFieldValue = vec4<f32>(electricFieldValue.x * keepFactor, 0.0, 0.0, 0.0);
     }
-    
-    // Add primary wave source - a plane wave
-    if (abs(normalizedUV.y - LIGHT_SOURCE_HEIGHT * simulation_parameters.viewportScale) < 0.02 / simulation_parameters.viewportScale) {
-        let phase = getWavelengthPhase(normalizedUV, simulation_parameters.wavelength, simulation_parameters.elapsedTime);
-        let sourceAmplitude = 4.0;
-        electricFieldValue = vec4<f32>(
-            electricFieldValue.x + sourceAmplitude * sin(phase),
-            0.0, 0.0, 0.0
-        );
+
+    // Primary emitter: use the simulation propagation direction so the wave source is independent from the global orientation control
+    let emitterBandHeightPx = f32(textureDimensions.y) * simulation_parameters.emitterBandHeight;
+    var isEmitterBand = false;
+    if (simulation_parameters.propagationDirection < 0.5) {
+        isEmitterBand = f32(y) <= emitterBandHeightPx;
+    } else if (simulation_parameters.propagationDirection < 1.5) {
+        isEmitterBand = f32(y) >= (f32(textureDimensions.y) - emitterBandHeightPx);
+    } else {
+        isEmitterBand = f32(x) <= emitterBandHeightPx;
     }
-    
-    // Add secondary sources at slit edges (Huygens' principle)
-    if (isInsideSlit(normalizedUV)) {
-        let amplitude = 15.0;
-        let slitCenter = vec2<f32>(normalizedUV.x, DIFFRACTION_GRATING_HEIGHT);
-        let phase = getWavelengthPhase(normalizedUV - slitCenter, 
-                                      simulation_parameters.wavelength, 
-                                      simulation_parameters.elapsedTime);
+
+    if (isEmitterBand) {
+        let direction = getPropagationDirectionVector();
+        let phase = getPlaneWavePhase(normalizedUV, simulation_parameters.wavelength, simulation_parameters.elapsedTime, direction);
         electricFieldValue = vec4<f32>(
-            (electricFieldValue.x + amplitude * sin(phase)) * 0.5,
+            electricFieldValue.x + simulation_parameters.emitterAmplitude * sin(phase),
             0.0, 0.0, 0.0
         );
     }

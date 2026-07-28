@@ -17,51 +17,96 @@ fn getWavelengthPhase(position: vec2<f32>, wavelength: f32, time: f32) -> f32 {
     return spatialFreq * length(position) + frequency * time;
 }
 
+fn getPropagationDirectionVector() -> vec2<f32> {
+    if (simulation_parameters.propagationDirection < 0.5) {
+        return vec2<f32>(0.0, -1.0); // Top -> Bottom
+    }
+    if (simulation_parameters.propagationDirection < 1.5) {
+        return vec2<f32>(0.0, 1.0); // Bottom -> Top
+    }
+    return vec2<f32>(-1.0, 0.0); // Left -> Right
+}
+
+fn getPlaneWavePhase(position: vec2<f32>, wavelength: f32, time: f32, direction: vec2<f32>) -> f32 {
+    let baseSpeed = 15.0;
+    let frequency = (baseSpeed / (wavelength * 0.01)) * simulation_parameters.emitterFrequencyScale;
+    let spatialFreq = 6.28 / (wavelength * 0.01);
+    return -spatialFreq * dot(position, direction) + frequency * time;
+}
+
+fn getGratingAnchor() -> vec2<f32> {
+    let textureDims = vec2<f32>(f32(textureDimensions(electricField).x), f32(textureDimensions(electricField).y));
+    let aspectRatio = textureDims.x / max(textureDims.y, 1.0);
+    let verticalScale = simulation_parameters.viewportScale;
+    let horizontalScale = simulation_parameters.viewportScale * aspectRatio;
+
+    var scaleForOffset: f32 = verticalScale;
+    if (simulation_parameters.propagationDirection > 1.5) {
+        scaleForOffset = horizontalScale;
+    }
+
+    let emitterBandThickness = simulation_parameters.emitterBandHeight * scaleForOffset;
+    let gratingOffset = simulation_parameters.slitPositionY * scaleForOffset;
+
+    if (simulation_parameters.propagationDirection < 0.5) {
+        return vec2<f32>(0.0, -verticalScale + emitterBandThickness + gratingOffset);
+    }
+    if (simulation_parameters.propagationDirection < 1.5) {
+        return vec2<f32>(0.0, verticalScale - emitterBandThickness - gratingOffset);
+    }
+    return vec2<f32>(-horizontalScale + emitterBandThickness + gratingOffset, 0.0);
+}
+
+fn getGratingNormal() -> vec2<f32> {
+    if (simulation_parameters.propagationDirection < 1.5) {
+        return vec2<f32>(0.0, 1.0);
+    }
+    return vec2<f32>(1.0, 0.0);
+}
+
+fn getGratingHalfThickness() -> f32 {
+    return max(0.01 * simulation_parameters.viewportScale, simulation_parameters.slitThickness * simulation_parameters.viewportScale);
+}
+
+fn getSlitPlaneKeepFactor() -> f32 {
+    let absorption = clamp(simulation_parameters.slitPlaneAbsorption, 0.0, 1.0);
+    return 1.0 - absorption;
+}
+
 // Function to determine if a point is within the diffraction grating material
 // Returns true for points in the grating material, false for points in slits
 fn isInDiffractionGrating(normalizedPosition: vec2<f32>) -> bool {
-    // Scale the grating height by the viewport scale
-    let gratingHeight = DIFFRACTION_GRATING_HEIGHT * simulation_parameters.viewportScale;
-    
-    // First check if we're near the grating's y-position
-    // The grating has a certain thickness
-    if (abs(normalizedPosition.y - gratingHeight) > 0.05) {
-        return false; // Not at grating height
+    let gratingAnchor = getGratingAnchor();
+    let gratingHalfThickness = getGratingHalfThickness();
+    let gratingNormal = getGratingNormal();
+
+    if (abs(dot(normalizedPosition - gratingAnchor, gratingNormal)) > gratingHalfThickness) {
+        return false;
     }
-    
-    // Multiple slits - check each slit position
+
+    let tangent = vec2<f32>(-gratingNormal.y, gratingNormal.x);
+    let projected = dot(normalizedPosition - gratingAnchor, tangent);
+
     for (var i = 0; i < i32(simulation_parameters.numberOfSlits); i = i + 1) {
-        // Calculate position of each slit
         var slitPosition: f32 = 0.0;
         if (simulation_parameters.numberOfSlits <= 1.0) {
-            slitPosition = 0.5;  // Center single slit
+            slitPosition = 0.5;
         } else {
             slitPosition = f32(i) / (simulation_parameters.numberOfSlits - 1.0);
         }
 
-        let slitCenterX = -simulation_parameters.grateWidth + 
-                          (2.0 * simulation_parameters.grateWidth * slitPosition);
-        
-        // Check if point is within this slit
-        if (abs(normalizedPosition.x - slitCenterX) < (simulation_parameters.slitWidth * 0.5)) {
-            return false; // In a slit (not in grating material)
+        let slitCenter = -simulation_parameters.grateWidth +
+                         (2.0 * simulation_parameters.grateWidth * slitPosition);
+
+        if (abs(projected - slitCenter) < (simulation_parameters.slitWidth * 0.5)) {
+            return false;
         }
     }
-    // At grating height but not in any slit = in grating material
     return true;
 }
 
 // Function to check if a point is inside a slit
 fn isInsideSlit(normalizedPosition: vec2<f32>) -> bool {
-    let gratingHeight = DIFFRACTION_GRATING_HEIGHT * simulation_parameters.viewportScale;
-    
-    // Check if we're near the grating's y-position
-    if (abs(normalizedPosition.y - gratingHeight) > 0.05) {
-        return false; // Not at grating height
-    }
-    
-    // We can leverage the existing grating function - if it's not in grating material,
-    // and it's at the grating height, then it must be inside a slit
     return !isInDiffractionGrating(normalizedPosition);
 }
 

@@ -23,10 +23,10 @@ export class fdtdComputePipelineDescriptor {
         this.initialize();
     }
 
-    initialize = async () => {
+    initialize = () => {
         this.createFDTDBindGroupLayout();
-        await this.createFDTDBindGroup();
-        await this.createFDTDPipelines();
+        this.createFDTDBindGroup();
+        this.createFDTDPipelines();
     }
     
     createFDTDBindGroupLayout = () => {
@@ -82,7 +82,7 @@ export class fdtdComputePipelineDescriptor {
     }
 
 
-    createFDTDPipelines = async () => {
+    createFDTDPipelines = () => {
         const fdtdBindGroupLayout = this.fdtdBindGroup_layout;
         const fdtdPipeline_layout = this.device.createPipelineLayout({
             bindGroupLayouts: [fdtdBindGroupLayout]
@@ -138,7 +138,7 @@ export class fdtdComputePipelineDescriptor {
     }
 
 
-    createFDTDBindGroup = async () => {
+    createFDTDBindGroup = () => {
         const bindGroupLayout = this.fdtdBindGroup_layout;
         
         this.fdtdBindGroup = this.device.createBindGroup({

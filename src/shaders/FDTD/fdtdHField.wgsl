@@ -11,8 +11,8 @@ fn update_h_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
     // Convert dimensions to i32 for comparison
     let maxDimensions = vec2<i32>(i32(textureDimensions.x), i32(textureDimensions.y));
     
-    // Bounds checking - skip if outside valid range
-    if (x < 0 || x >= maxDimensions.x - 1 || y < 0 || y >= maxDimensions.y - 1) {
+    // Bounds checking - keep a one-texel margin so neighbor loads stay in-bounds.
+    if (x <= 0 || x >= maxDimensions.x - 2 || y <= 0 || y >= maxDimensions.y - 2) {
         return;
     }
     
@@ -45,6 +45,18 @@ fn update_h_fields(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>)
         // Gradually dampen waves at boundaries
         magneticXValue = magneticXValue * absorptionFactor;
         magneticYValue = magneticYValue * absorptionFactor;
+    }
+
+    let fragCoord = vec2<f32>(f32(x), f32(y));
+    let resolution = vec2<f32>(f32(textureDimensions.x), f32(textureDimensions.y));
+    var normalizedUV = (2.0 * fragCoord - resolution) / resolution.y;
+    normalizedUV = normalizedUV * simulation_parameters.viewportScale;
+
+    // Inside slit plane material: absorb rather than reflect.
+    if (isInDiffractionGrating(normalizedUV)) {
+        let keepFactor = getSlitPlaneKeepFactor();
+        magneticXValue = magneticXValue * keepFactor;
+        magneticYValue = magneticYValue * keepFactor;
     }
     
     // Store the updated magnetic field values

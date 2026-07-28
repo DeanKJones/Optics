@@ -4,7 +4,6 @@ import { SettingsManager } from "../worldSettings/settingsManager";
 
 // Remdering
 import { RenderContext } from "./renderContext";
-import { VoxelWorldRenderer } from "./voxelWorldRenderer";
 
 export class Renderer {
     canvas: HTMLCanvasElement;
@@ -19,9 +18,6 @@ export class Renderer {
     settingsManager: SettingsManager;
 
     initialized: boolean = false;
-    texturesLoaded: boolean = false;
-
-    voxelWorldRenderer!: VoxelWorldRenderer;
     
     constructor(canvas: HTMLCanvasElement, private renderContext?: RenderContext) {
         this.canvas = canvas;
@@ -32,18 +28,6 @@ export class Renderer {
         await this.setupDevice();
         this.bufferManager = new BufferManager(this.device, this.canvas);
         this.pipelineManager = new PipelineManager(this.device, this.bufferManager);
-        
-        // Load textures for VoxelSpace rendering
-        await this.loadVoxelSpaceTextures();
-
-        this.voxelWorldRenderer = new VoxelWorldRenderer(
-            this.device,
-            this.context,
-            this.canvas,
-            this.bufferManager.voxelWorldBuffers,
-            this.pipelineManager.voxelWorldPipeline,
-            this.renderContext || new RenderContext()
-        );
         
         this.initialized = true;
     }
@@ -61,6 +45,11 @@ export class Renderer {
                 throw new Error("Failed to get GPU device.");
             }
             this.device = device;
+
+            this.device.addEventListener("uncapturederror", (event) => {
+                const gpuEvent = event as GPUUncapturedErrorEvent;
+                console.error("WebGPU uncaptured error:", gpuEvent.error);
+            });
 
             this.device.lost.then((info) => {
                 console.error("WebGPU device was lost:", info);
@@ -97,20 +86,6 @@ export class Renderer {
             console.error("Error during WebGPU setup:", error);
         }
     }
-    
-    async loadVoxelSpaceTextures() {
-        try {
-            // Load the VoxelSpace textures
-            await this.bufferManager.voxelSpaceBuffers.loadTextures(
-                'assets/textures/voxelSpace/HeightMap.png',
-                'assets/textures/voxelSpace/ColorImage.png'
-            );
-            this.texturesLoaded = true;
-            console.log("VoxelSpace textures loaded successfully");
-        } catch (error) {
-            console.error("Failed to load VoxelSpace textures:", error);
-        }
-    }
 
     render(deltaTime: number) {
         if (!this.initialized) {
@@ -123,62 +98,32 @@ export class Renderer {
         
         // Update uniform buffers with the latest settings
         this.bufferManager.opticsUniformBuffer.updateBuffer(this.settingsManager.optics);
-        this.bufferManager.voxelSpaceUniformBuffer.updateBuffer(this.settingsManager.voxelSpace);
-        
-        // Render based on the current mode
-        switch (this.settingsManager.renderMode) {
-            case 'fdtd':
-                this.renderFdtdSimulation();
-                break;
-            case 'voxelspace':
-                if (this.texturesLoaded) {
-                    this.renderVoxelSpace();
-                }
-                break;
-            case 'voxelworld':
-                this.renderVoxelWorld(deltaTime);
-                break;
-            case 'wave':
-            default:
-                this.renderWaveOptics();
-                break;
-        }
-    }
-
-    renderVoxelWorld(deltaTime: number) {
-        this.renderContext?.setRenderPass('Voxel World');
-        this.voxelWorldRenderer.render(deltaTime);
-    }
-    
-    renderWaveOptics() {
-        this.renderContext?.setRenderPass('Wave Optics');
-        const commandEncoder = this.device.createCommandEncoder();
-        
-        const ray_trace_pass = commandEncoder.beginComputePass();
-        ray_trace_pass.setPipeline(this.pipelineManager.computePipeline.computePipeline);
-        ray_trace_pass.setBindGroup(0, this.pipelineManager.computePipeline.computeBindGroup);
-        ray_trace_pass.dispatchWorkgroups(
-            this.canvas.width * 4,
-            this.canvas.height * 4, 1
-        );
-        ray_trace_pass.end();
-        
-        this.renderToScreen(commandEncoder, this.pipelineManager.screenPipeline.screenBindGroup);
+        this.renderFdtdSimulation();
     }
     
     renderFdtdSimulation() {
+        if (!this.pipelineManager?.fdtdPipeline?.fdtdPipelineH ||
+            !this.pipelineManager?.fdtdPipeline?.fdtdPipelineE ||
+            !this.pipelineManager?.fdtdPipeline?.fdtdVisualizationPipeline ||
+            !this.pipelineManager?.screenPipeline?.screenPipeline) {
+            return;
+        }
+
         this.renderContext?.setRenderPass('FDTD Simulation');
         const commandEncoder = this.device.createCommandEncoder();
         
         // FDTD computation involves multiple passes
         const fdtd_compute_pass = commandEncoder.beginComputePass();
         
+        const textureWidth = this.bufferManager.fdtdBuffers.ezBuffer.width;
+        const textureHeight = this.bufferManager.fdtdBuffers.ezBuffer.height;
+
         // 1. Update H fields
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineH);
         fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width * 2 / 8),
-            Math.ceil(this.canvas.height * 2 / 8), 
+            Math.ceil(textureWidth / 8),
+            Math.ceil(textureHeight / 8),
             1
         );
         
@@ -186,8 +131,8 @@ export class Renderer {
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdPipelineE);
         fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width * 2 / 8),
-            Math.ceil(this.canvas.height * 2 / 8), 
+            Math.ceil(textureWidth / 8),
+            Math.ceil(textureHeight / 8),
             1
         );
         
@@ -195,8 +140,8 @@ export class Renderer {
         fdtd_compute_pass.setPipeline(this.pipelineManager.fdtdPipeline.fdtdVisualizationPipeline);
         fdtd_compute_pass.setBindGroup(0, this.pipelineManager.fdtdPipeline.fdtdBindGroup);
         fdtd_compute_pass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width * 2 / 8),
-            Math.ceil(this.canvas.height * 2 / 8), 
+            Math.ceil(textureWidth / 8),
+            Math.ceil(textureHeight / 8),
             1
         );
         
@@ -219,42 +164,6 @@ export class Renderer {
         });
         
         this.renderToScreen(commandEncoder, fdtdScreenBindGroup);
-    }
-    
-    renderVoxelSpace() {
-        this.renderContext?.setRenderPass('VoxelSpace');
-        const commandEncoder = this.device.createCommandEncoder();
-        
-        // Execute VoxelSpace compute shader
-        const computePass = commandEncoder.beginComputePass();
-        computePass.setPipeline(this.pipelineManager.voxelSpacePipeline.voxelSpacePipeline);
-        computePass.setBindGroup(0, this.pipelineManager.voxelSpacePipeline.voxelSpaceBindGroup);
-        
-        // Calculate workgroups to cover the entire screen with 16x16 workgroups
-        computePass.dispatchWorkgroups(
-            Math.ceil(this.canvas.width / 16),
-            Math.ceil(this.canvas.height / 16),
-            1
-        );
-        computePass.end();
-        
-        // Create a bind group to render the VoxelSpace output to the screen
-        const voxelSpaceScreenBindGroup = this.device.createBindGroup({
-            label: "VoxelSpace Screen Bind Group",
-            layout: this.pipelineManager.screenPipeline.screenPipeline.getBindGroupLayout(0),
-            entries: [
-                {
-                    binding: 0,
-                    resource: this.bufferManager.voxelSpaceBuffers.sampler
-                },
-                {
-                    binding: 1,
-                    resource: this.bufferManager.voxelSpaceBuffers.outputTextureView
-                }
-            ]
-        });
-        
-        this.renderToScreen(commandEncoder, voxelSpaceScreenBindGroup);
     }
     
     // Helper method to render to screen
@@ -305,19 +214,12 @@ export class Renderer {
         this.device.queue.submit([commandEncoder.finish()]);
         console.log("FDTD simulation reset successfully");
     }
-    
-    resetVoxelWorld() {
-        if (this.voxelWorldRenderer) {
-            this.voxelWorldRenderer.reset();
-        }
-    }
 
-    // Public methods for changing render mode
-    setRenderMode(mode: 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld'): void {
+    setRenderMode(mode: 'fdtd'): void {
         this.settingsManager.renderMode = mode;
     }
     
-    getRenderMode(): 'wave' | 'fdtd' | 'voxelspace' | 'voxelworld' {
+    getRenderMode(): 'fdtd' {
         return this.settingsManager.renderMode;
     }
 }

@@ -17,82 +17,190 @@
         </div>
         <div id="divider"></div>
         <div id="scene-container">
-
-            <div class="parameters-box" id="parameters-box">
-                <div class="parameters-toggle" id="params-toggle">
-                    <div class="toggle-icon">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+            <div id="parameters-stack">
+                <div class="parameter-scene">
+                    <div class="parameter-scene-header">
+                        <div class="parameter-scene-title">
+                            <h3>Parameters</h3>
+                            <p>Select a component to edit the controls below.</p>
+                        </div>
+                        <button class="collapse-toggle" id="parameter-collapse-toggle" type="button" aria-expanded="true" aria-label="Collapse parameters panel">▾</button>
+                        <div class="component-selector" role="tablist" aria-label="Select parameter component">
+                            <button class="component-tab active" type="button" data-panel="simulation" aria-selected="true">Simulation</button>
+                            <button class="component-tab" type="button" data-panel="grate" aria-selected="false">Grid</button>
+                            <button class="component-tab" type="button" data-panel="wave" aria-selected="false">Wave</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="parameters-content">
-                    <div class="parameters-header">
-                        <h2>Wave Simulation Parameters</h2>
-                        <p class="description">Adjust the parameters of the light wave and diffraction grating</p>
-                    </div>
+                    <div class="parameter-window">
+                        <div class="parameter-panel active" data-panel="simulation">
+                            <div class="parameters-box simulation-box" id="simulation-parameters-box">
+                                <div class="parameters-content">
+                                    <div class="parameters-header">
+                                        <p class="description">Adjust the visible simulation region and placement</p>
+                                    </div>
 
-                    <div class="parameter-group">
-                        <label for="wavelength-slider">
-                            <span class="parameter-name">Wavelength</span>
-                            <span class="parameter-description">Controls the color of the light wave</span>
-                            <div class="slider-container">
-                                <input type="range" id="wavelength-slider" min="100" max="1000" value="500" step="10">
-                                <span id="wavelength-value" class="value-display">500 nm</span>
+                                    <div class="parameter-group">
+                                        <label for="screen-size-mult-slider">
+                                            <span class="parameter-name">Screen Size</span>
+                                            <span class="parameter-description">Controls the visible area of the simulation</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="screen-size-mult-slider" min="1.0" max="5.0" value="1.0"
+                                                    step="0.1">
+                                                <span id="screen-size-mult-value" class="value-display">1.0</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="parameter-group">
+                                        <label for="slit-position-slider">
+                                            <span class="parameter-name">Grate Distance</span>
+                                            <span class="parameter-description">Distance of the grating from the emitter band, following the selected propagation direction</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="slit-position-slider" min="0.005" max="0.20" value="0.02"
+                                                    step="0.001">
+                                                <span id="slit-position-value" class="value-display">2.0%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+
+                                    <div class="parameter-group">
+                                        <label for="slit-plane-absorption-slider">
+                                            <span class="parameter-name">Slit Plane Absorption</span>
+                                            <span class="parameter-description">Absorption in the non-slit parts of the plane (90-100%)</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="slit-plane-absorption-slider" min="0.90" max="1.00" value="1.00"
+                                                    step="0.01">
+                                                <span id="slit-plane-absorption-value" class="value-display">100%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="parameter-group">
+                                        <label for="propagation-direction-select">
+                                            <span class="parameter-name">Propagation Direction</span>
+                                            <span class="parameter-description">Choose the overall propagation direction used by the simulation</span>
+                                            <div class="slider-container">
+                                                <select id="propagation-direction-select">
+                                                    <option value="0" selected>Top to Bottom</option>
+                                                    <option value="1">Bottom to Top</option>
+                                                    <option value="2">Left to Right</option>
+                                                </select>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                        </label>
-                    </div>
+                        </div>
 
-                    <div class="parameter-group">
-                        <label for="slit-width-slider">
-                            <span class="parameter-name">Slit Width</span>
-                            <span class="parameter-description">Controls the width of each slit in the diffraction
-                                grating</span>
-                            <div class="slider-container">
-                                <input type="range" id="slit-width-slider" min="0.001" max="0.050" value="0.005"
-                                    step="0.001">
-                                <span id="slit-width-value" class="value-display">0.005 mm</span>
-                            </div>
-                        </label>
-                    </div>
+                        <div class="parameter-panel" data-panel="grate">
+                            <div class="parameters-box emitter-box" id="grate-parameters-box">
+                                <div class="parameters-content">
+                                    <div class="parameters-header">
+                                        <p class="description">Tune the diffraction grating geometry</p>
+                                    </div>
 
-                    <div class="parameter-group">
-                        <label for="grate-width-slider">
-                            <span class="parameter-name">Grate Width</span>
-                            <span class="parameter-description">Controls the total width of the diffraction
-                                grating</span>
-                            <div class="slider-container">
-                                <input type="range" id="grate-width-slider" min="0.05" max="1.5" value="0.40"
-                                    step="0.01">
-                                <span id="grate-width-value" class="value-display">0.30 mm</span>
-                            </div>
-                        </label>
-                    </div>
+                                    <div class="parameter-group">
+                                        <label for="slit-width-slider">
+                                            <span class="parameter-name">Slit Width</span>
+                                            <span class="parameter-description">Controls the width of each slit in the diffraction
+                                                grating</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="slit-width-slider" min="0.001" max="0.050" value="0.005"
+                                                    step="0.001">
+                                                <span id="slit-width-value" class="value-display">0.005 mm</span>
+                                            </div>
+                                        </label>
+                                    </div>
 
-                    <div class="parameter-group">
-                        <label for="number-of-slits-slider">
-                            <span class="parameter-name">Number of Slits</span>
-                            <span class="parameter-description">Controls how many slits are in the diffraction
-                                grating</span>
-                            <div class="slider-container">
-                                <input type="range" id="number-of-slits-slider" min="1.0" max="25.0" value="10.0"
-                                    step="1.0">
-                                <span id="number-of-slits-value" class="value-display">10</span>
-                            </div>
-                        </label>
-                    </div>
+                                    <div class="parameter-group">
+                                        <label for="grate-width-slider">
+                                            <span class="parameter-name">Grate Width</span>
+                                            <span class="parameter-description">Controls the total width of the diffraction
+                                                grating</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="grate-width-slider" min="0.05" max="1.5" value="0.40"
+                                                    step="0.01">
+                                                <span id="grate-width-value" class="value-display">0.30 mm</span>
+                                            </div>
+                                        </label>
+                                    </div>
 
-                    <div class="parameter-group">
-                        <label for="screen-size-mult-slider">
-                            <span class="parameter-name">Screen Size</span>
-                            <span class="parameter-description">Controls the visible area of the simulation</span>
-                            <div class="slider-container">
-                                <input type="range" id="screen-size-mult-slider" min="1.0" max="5.0" value="1.0"
-                                    step="0.1">
-                                <span id="screen-size-mult-value" class="value-display">1.0</span>
+                                    <div class="parameter-group">
+                                        <label for="number-of-slits-slider">
+                                            <span class="parameter-name">Number of Slits</span>
+                                            <span class="parameter-description">Controls how many slits are in the diffraction
+                                                grating</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="number-of-slits-slider" min="1.0" max="25.0" value="10.0"
+                                                    step="1.0">
+                                                <span id="number-of-slits-value" class="value-display">10</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="parameter-group">
+                                        <label for="slit-thickness-slider">
+                                            <span class="parameter-name">Slit Thickness</span>
+                                            <span class="parameter-description">Thickness of the grating as a fraction of screen height</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="slit-thickness-slider" min="0.010" max="0.020" value="0.015"
+                                                    step="0.001">
+                                                <span id="slit-thickness-value" class="value-display">1.50%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                </div>
                             </div>
-                        </label>
+                        </div>
+
+                        <div class="parameter-panel" data-panel="wave">
+                            <div class="parameters-box emitter-box" id="emitter-parameters-box">
+                                <div class="parameters-content">
+                                    <div class="parameters-header">
+                                        <p class="description">Edit wavelength, amplitude, and color visualization for the wave source</p>
+                                    </div>
+
+                                    <div class="parameter-group">
+                                        <label for="wavelength-slider">
+                                            <span class="parameter-name">Wavelength</span>
+                                            <span class="parameter-description">Controls the wave source wavelength and its perceived color</span>
+                                            <div class="slider-container">
+                                                <input type="range" id="wavelength-slider" min="100" max="1000" value="500" step="10">
+                                                <span id="wavelength-value" class="value-display">500 nm</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="parameter-group emitter-panel">
+                                        <span class="parameter-name">Wave Properties</span>
+                                        <span class="parameter-description">Wave-specific settings for the source and visual feedback</span>
+
+                                        <div class="slider-container">
+                                            <label for="emitter-amplitude-slider">Amplitude</label>
+                                            <input type="range" id="emitter-amplitude-slider" min="0.00" max="10.00" value="4.00" step="0.10">
+                                            <span id="emitter-amplitude-value" class="value-display">4.0</span>
+                                        </div>
+
+                                        <div class="slider-container color-picker-row">
+                                            <label for="positive-color-input">Positive Field Color</label>
+                                            <div class="color-picker">
+                                                <input type="color" id="positive-color-input" value="#0000ff">
+                                            </div>
+                                        </div>
+
+                                        <div class="slider-container color-picker-row">
+                                            <label for="negative-color-input">Negative Field Color</label>
+                                            <div class="color-picker">
+                                                <input type="color" id="negative-color-input" value="#ff0000">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,51 +209,48 @@
 
     <div id="key-label"></div>
 
-    <div class="nav-header">
-        <a href="#" onclick="switchMode('wave'); return false;" class="active" id="nav-optics">Optics</a>
-        <a href="#" onclick="switchMode('voxelspace'); return false;" id="nav-voxelspace">VoxelSpace</a>
-    </div>
-
     <script>
-        // Function to switch between different visualization modes
-        function switchMode(mode) {
-            document.getElementById('nav-optics').classList.toggle('active', mode === 'wave');
-            document.getElementById('nav-voxelspace').classList.toggle('active', mode === 'voxelspace');
-
-            if (window.app && window.app.ui) {
-                window.app.ui.setMode(mode);
-                window.app.renderer.setRenderMode(mode);
-            }
-        }
-
-        // Add toggle functionality for parameters box
         document.addEventListener('DOMContentLoaded', function () {
-        const paramsBox = document.getElementById('parameters-box');
-        const paramsToggle = document.getElementById('params-toggle');
-            
-        // Toggle when clicking the hamburger icon
-        paramsToggle.addEventListener('click', function (event) {
-            event.stopPropagation(); // Prevent the box click handler from firing
-            paramsBox.classList.toggle('collapsed');
-        });
-        
-        // Toggle when clicking the box itself (but not the sliders or other controls)
-        paramsBox.addEventListener('click', function (event) {
-            // Check if the click was on the box background, not on a control
-            const isClickOnControl = event.target.closest('.parameter-group') || 
-                                    event.target.closest('.slider-container') ||
-                                    event.target.closest('input') ||
-                                    event.target.closest('.value-display');
-            
-            // If click was not on a control, toggle the collapsed state
-            if (!isClickOnControl) {
-                paramsBox.classList.toggle('collapsed');
+            const tabs = Array.from(document.querySelectorAll('.component-tab'));
+            const panels = Array.from(document.querySelectorAll('.parameter-panel'));
+            const scene = document.querySelector('.parameter-scene');
+            const collapseToggle = document.getElementById('parameter-collapse-toggle');
+
+            function activatePanel(panelName) {
+                tabs.forEach((tab) => {
+                    const isActive = tab.getAttribute('data-panel') === panelName;
+                    tab.classList.toggle('active', isActive);
+                    tab.setAttribute('aria-selected', String(isActive));
+                });
+
+                panels.forEach((panel) => {
+                    const isActive = panel.getAttribute('data-panel') === panelName;
+                    panel.classList.toggle('active', isActive);
+                });
             }
+
+            function setCollapsed(isCollapsed) {
+                scene?.classList.toggle('collapsed', isCollapsed);
+                if (collapseToggle) {
+                    collapseToggle.setAttribute('aria-expanded', String(!isCollapsed));
+                    collapseToggle.setAttribute('aria-label', isCollapsed ? 'Expand parameters panel' : 'Collapse parameters panel');
+                    collapseToggle.textContent = isCollapsed ? '▸' : '▾';
+                }
+            }
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    activatePanel(tab.getAttribute('data-panel') || 'simulation');
+                });
+            });
+
+            collapseToggle?.addEventListener('click', () => {
+                setCollapsed(scene?.classList.contains('collapsed') !== true);
+            });
+
+            activatePanel('simulation');
+            setCollapsed(false);
         });
-        
-        // Initialize in expanded state
-        paramsBox.classList.remove('collapsed');
-    });
     </script>
 
     <script src="dist/main.js"></script>
