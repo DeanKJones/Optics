@@ -37,10 +37,10 @@ export class VoxelSpaceSettings {
             this.positionY -= Math.cos(this.angle) * this.moveSpeed;
         }
         if (this.turnLeft) {
-            this.angle -= this.turnSpeed;
+            this.angle += this.turnSpeed;
         }
         if (this.turnRight) {
-            this.angle += this.turnSpeed;
+            this.angle -= this.turnSpeed;
         }
         if (this.moveUp && this.height < 300) {
             this.height += 2;

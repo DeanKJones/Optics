@@ -6,6 +6,7 @@ export class VoxelSpacePipelineDescription {
     device: GPUDevice;
     bufferManager: BufferManager;
     voxelSpaceUniformBuffer: VoxelSpaceUniformBufferDescription;
+    ready: Promise<void>;
     
     voxelSpaceBindGroupLayout!: GPUBindGroupLayout;
     voxelSpaceBindGroup!: GPUBindGroup;
@@ -15,7 +16,7 @@ export class VoxelSpacePipelineDescription {
         this.device = device;
         this.bufferManager = bufferManager;
         this.voxelSpaceUniformBuffer = bufferManager.voxelSpaceUniformBuffer;
-        this.initialize();
+        this.ready = this.initialize();
     }
     
     initialize = async () => {

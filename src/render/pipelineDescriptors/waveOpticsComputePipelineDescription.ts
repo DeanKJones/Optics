@@ -4,6 +4,7 @@ import computeKernel from "../../gpu/shaders/waveOptics/waveCompute.wgsl";
 export class computePipelineDescriptor {
     device: GPUDevice;
     bufferManager: BufferManager;
+    ready: Promise<void>;
 
     computeBindGroup_layout!: GPUBindGroupLayout;
     computeBindGroup!: GPUBindGroup;
@@ -12,7 +13,7 @@ export class computePipelineDescriptor {
     constructor(device: GPUDevice, bufferManager: BufferManager) {
         this.device = device;
         this.bufferManager = bufferManager;
-        this.initialize();
+        this.ready = this.initialize();
     }
 
     initialize = async () => {

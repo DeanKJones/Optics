@@ -6,6 +6,7 @@ export class screenPipelineDescriptor {
 
     device: GPUDevice;
     bufferManager: BufferManager;
+    ready: Promise<void>;
 
     screenBindGroup_layout!: GPUBindGroupLayout;
     screenPipeline!: GPURenderPipeline;
@@ -14,7 +15,7 @@ export class screenPipelineDescriptor {
     constructor(device: GPUDevice, bufferManager: BufferManager) {
         this.device = device;
         this.bufferManager = bufferManager;
-        this.initialize();
+        this.ready = this.initialize();
     }
 
     initialize = async () => {

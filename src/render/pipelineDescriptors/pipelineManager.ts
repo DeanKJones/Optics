@@ -21,4 +21,13 @@ export class PipelineManager {
         this.screenPipeline = new screenPipelineDescriptor(this.device, bufferManager);
         this.voxelSpacePipeline = new VoxelSpacePipelineDescription(this.device, bufferManager);
     }
+
+    public async ready(): Promise<void> {
+        await Promise.all([
+            this.fdtdPipeline.ready,
+            this.computePipeline.ready,
+            this.screenPipeline.ready,
+            this.voxelSpacePipeline.ready,
+        ]);
+    }
 }

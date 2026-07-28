@@ -9,6 +9,7 @@ export class fdtdComputePipelineDescriptor {
 
     device: GPUDevice;
     bufferManager: BufferManager;
+    ready: Promise<void>;
 
     fdtdBindGroup!: GPUBindGroup;
     fdtdBindGroup_layout!: GPUBindGroupLayout;
@@ -20,7 +21,7 @@ export class fdtdComputePipelineDescriptor {
     constructor(device: GPUDevice, bufferManager: BufferManager) {
         this.device = device;
         this.bufferManager = bufferManager;
-        this.initialize();
+        this.ready = this.initialize();
     }
 
     initialize = async () => {

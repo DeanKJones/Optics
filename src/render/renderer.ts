@@ -27,6 +27,7 @@ export class Renderer {
         await this.setupDevice();
         this.bufferManager = new BufferManager(this.device, this.canvas);
         this.pipelineManager = new PipelineManager(this.device, this.bufferManager);
+        await this.pipelineManager.ready();
         
         // Load textures for VoxelSpace rendering
         await this.loadVoxelSpaceTextures();

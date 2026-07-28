@@ -5,8 +5,8 @@ fn rotate(p: vec2<f32>, angle: f32) -> vec2<f32> {
     let sinAngle = sin(angle);
     let cosAngle = cos(angle);
     return vec2<f32>(
-        p.x * cosAngle - p.y * sinAngle,
-        p.x * sinAngle + p.y * cosAngle
+        p.x * cosAngle + p.y * sinAngle,
+        p.x * sinAngle - p.y * cosAngle
     );
 }
 

@@ -47,8 +47,9 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
             }
             let horizontalSlitCoordinate = -uniform_buffer.grateWidth + (2.0 * uniform_buffer.grateWidth) * frac;
 
-            // Calculate emitters for this slit based on width
-            let emittersPerSlit = max(1, i32((uniform_buffer.slitWidth * 10.0) * EMITTER_DENSITY));
+            // Calculate emitters for this slit based on width, but cap the work so
+            // wide slits do not turn each pixel into a very large inner loop.
+            let emittersPerSlit = min(max(1, i32((uniform_buffer.slitWidth * 10.0) * EMITTER_DENSITY)), 12);
             totalEmitters += emittersPerSlit;
 
             for (var j = 0; j < emittersPerSlit; j = j + 1) {
